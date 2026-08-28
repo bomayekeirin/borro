@@ -1,0 +1,1377 @@
+@charset "UTF-8";
+/* ==========================================================================
+   bo-rro !（borro） ─ 共通スタイル（do-ya? 型ベース）
+   --------------------------------------------------------------------------
+   do-ya? から踏襲した骨格：
+   1. 文字が太い。本文500・見出し700〜900。日本語は太いほうが心地よい
+   2. 縦は「セクション」でくっきり区切る（帯の背景色を変えて境目を作る）
+   3. 各セクションの中身は「横スライド」。縦に延々と並べない
+   4. ヘッダーは細い固定バー＋全画面メニュー
+   5. セクション見出しは【英語（大）＋日本語のひとこと（小）】の二段
+   ========================================================================== */
+
+:root {
+  /* --- 海（枕崎の夜明け前の海から）--------------------------------------- */
+  --sea-deep:    #071E2B;
+  --sea-mid:     #0E3346;
+  --sea-shallow: #17506A;
+  --foam:        #EDF3F1;
+
+  /* --- 浮きの色（カテゴリ色）＝実際の漁具の配色から --------------------- */
+  --c-go:     #35A8C9;
+  --c-eat:    #E8512B;
+  --c-drink:  #C42A6E;
+  --c-beauty: #6FCBB0;
+  --c-life:   #2F62AA;
+  --c-work:   #EFA92B;
+  --accent: var(--c-eat);
+
+  /* --- 墨・紙 ------------------------------------------------------------ */
+  --ink:       #14232B;
+  --ink-mid:   #4A5C66;
+  --ink-faint: #8598A2;
+  --paper:      #FBFAF6;
+  --paper-warm: #F4F0E6;
+
+  /* --- 書体 --------------------------------------------------------------
+     見出し：Quicksand（英字）＋ Zen Maru Gothic（和文）
+     本文  ：Zen Kaku Gothic New＝小ぶりで読みやすい
+     数字  ：Roboto Mono＝営業時間・電話番号・料金が縦に揃う
+     ---------------------------------------------------------------------- */
+  --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  --font-body: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-data: "Roboto Mono", ui-monospace, monospace;
+
+  /* --- 文字の太さ（do-ya? の心地よさの正体）------------------------------
+     日本語は 400 だと画面上でスカスカに見える。本文の基準を 500 に置く。
+     弱く見せたいときは太さを落とさず、色で調整する。
+     ---------------------------------------------------------------------- */
+  --w-body: 500;
+  --w-strong: 700;
+  --w-head: 700;
+  --w-hero: 900;
+
+  /* --- 文字サイズ -------------------------------------------------------- */
+  --t-xs: .75rem;  --t-sm: .875rem; --t-base: 1rem;
+  --t-md: 1.333rem; --t-lg: 1.777rem; --t-xl: 2.369rem;
+  --t-2xl: 3.157rem; --t-3xl: 4.209rem;
+
+  /* --- 余白 -------------------------------------------------------------- */
+  --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem; --s-5:1.25rem;
+  --s-6:1.5rem; --s-8:2rem; --s-10:2.5rem; --s-12:3rem; --s-16:4rem; --s-24:6rem;
+
+  /* --- ★do-ya? から借りた技法用（役割だけ借り、色は枕崎のもの）----------
+     ・黒×黄の「明度差」は物理なのでそのまま借りる。ただし黒は海の紺に寄せる
+     ・面積を絞って使う。帯・バッジ・ボタンだけ。全面には広げない
+     -------------------------------------------------------------------- */
+  --pop-dark:  #071E2B;   /* do-ya?の #0D0D0D に相当。海に寄せた濃紺 */
+  --pop-light: #EFA92B;   /* do-ya?の #FCC81E に相当。漁具の黄 */
+
+  /* 帯の色（明度を高く保つ＝彩度が高くても下品にならない） */
+  --band-sun:  #F2C230;   /* 黄の帯 */
+  --band-coral:#F5B5A8;   /* 朱を薄めた帯 */
+  --band-sky:  #A8DCE8;   /* 浅瀬の帯 */
+  --band-moss: #BFD8C4;   /* 茶畑の帯 */
+
+  /* ★カードの黒枠。影ではなく線で立体感を出す＝フラットなのに沈まない */
+  --line: 2px;
+
+  --r-sm: 6px; --r-md: 14px; --r-lg: 24px; --r-full: 999px;
+  --wrap: 1160px;
+  --ease: cubic-bezier(.22,1,.36,1);
+  --tap: 56px;              /* 高齢者の指を想定した最小タップ領域 */
+  --header-h: 60px;
+}
+
+body[data-cat="go"]     { --accent: var(--c-go); }
+body[data-cat="eat"]    { --accent: var(--c-eat); }
+body[data-cat="drink"]  { --accent: var(--c-drink); }
+body[data-cat="beauty"] { --accent: var(--c-beauty); }
+body[data-cat="life"]   { --accent: var(--c-life); }
+body[data-cat="work"]   { --accent: var(--c-work); }
+
+/* ==========================================================================
+   リセット
+   ========================================================================== */
+*,*::before,*::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; scroll-padding-top: var(--header-h); }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--t-base);
+  font-weight: var(--w-body);
+  line-height: 1.75;
+  color: var(--ink);
+  background: transparent;   /* ★背景イラストを透かすため */
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1,h2,h3,h4 { font-family: var(--font-display); font-weight: var(--w-head); line-height:1.25; margin:0; }
+p { margin:0; }
+strong,b { font-weight: var(--w-strong); }
+ul,ol { margin:0; padding:0; list-style:none; }
+img { max-width:100%; display:block; }
+a { color:inherit; text-decoration:none; }
+button { font:inherit; color:inherit; border:none; background:none; cursor:pointer; }
+:focus-visible { outline:3px solid var(--accent); outline-offset:3px; border-radius:3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+}
+
+/* ページ遷移で白飛びさせない */
+body { opacity:1; transform:translateY(0); transition:opacity .36s var(--ease), transform .36s var(--ease); }
+html.entering body { opacity:0; transform:translateY(10px); }
+html.leaving  body { opacity:0; transform:translateY(-6px); transition-duration:.22s; }
+@media (prefers-reduced-motion: reduce) {
+  html.entering body, html.leaving body { opacity:1; transform:none; }
+}
+
+.wrap { width:min(100% - var(--s-8), var(--wrap)); margin-inline:auto; }
+.vh { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.num { font-family:var(--font-data); font-weight:500; }
+
+/* ==========================================================================
+   ヘッダー ─ 細い固定バー ＋ 全画面メニュー（do-ya? 型）
+   ========================================================================== */
+.hd {
+  position: sticky; top: 0; z-index: 40;
+  height: var(--header-h);
+  display: flex; align-items: center; gap: var(--s-4);
+  padding: 0 var(--s-5);
+  background: rgba(251,250,246,.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(20,35,43,.09);
+}
+body.dark .hd { background: rgba(7,30,43,.82); border-bottom-color: rgba(237,243,241,.14); }
+
+.hd-logo { display:flex; align-items:baseline; gap:var(--s-2); }
+.hd-logo b { font-family:var(--font-display); font-weight:var(--w-hero); font-size:1.15rem; letter-spacing:.04em; }
+.hd-logo span { font-family:var(--font-data); font-size:.6rem; letter-spacing:.2em; opacity:.5; }
+
+/* 現在のカテゴリを示す小さなタグ */
+.hd-now {
+  font-size: var(--t-xs); font-weight: 700;
+  padding: 4px 11px; border-radius: var(--r-full);
+  background: var(--accent); color:#fff;
+}
+
+/* ★do-ya? の代表例：黒地に黄文字。小さい面積だが最も目を引く */
+.hd-menu {
+  margin-left:auto; display:flex; align-items:center; gap:var(--s-2);
+  min-height:44px; padding:0 var(--s-5);
+  border-radius:var(--r-full);
+  background: var(--pop-dark); color: var(--pop-light);
+  font-size:var(--t-xs); font-weight:700; letter-spacing:.08em;
+  transition: filter .2s var(--ease);
+}
+.hd-menu:hover { filter: brightness(1.25); }
+.hd-menu-bars { display:grid; gap:3px; }
+.hd-menu-bars i { display:block; width:15px; height:2px; background:currentColor; border-radius:2px; }
+
+/* --- 全画面メニュー ----------------------------------------------------- */
+.nav {
+  position: fixed; inset: 0; z-index: 60;
+  background: var(--sea-deep); color: var(--foam);
+  padding: var(--s-6);
+  overflow-y: auto;
+  opacity: 0; visibility: hidden;
+  transition: opacity .3s var(--ease), visibility .3s;
+}
+.nav.on { opacity:1; visibility:visible; }
+.nav-close {
+  position:absolute; top:var(--s-4); right:var(--s-5);
+  display:flex; align-items:center; gap:var(--s-2);
+  min-height:44px; padding:0 var(--s-4);
+  border:1.5px solid rgba(237,243,241,.4); border-radius:var(--r-full);
+  font-size:var(--t-xs); font-weight:700; letter-spacing:.1em;
+}
+.nav-in { max-width:var(--wrap); margin:var(--s-16) auto 0; }
+.nav-lead { font-family:var(--font-data); font-size:var(--t-xs); letter-spacing:.3em; opacity:.5; }
+.nav-grid {
+  margin-top:var(--s-5);
+  display:grid; gap:var(--s-3);
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+}
+.nav-card {
+  display:flex; align-items:center; gap:var(--s-3);
+  padding:var(--s-5); border-radius:var(--r-md);
+  border:1.5px solid var(--c); background:rgba(7,30,43,.4);
+  transition: background .24s var(--ease), transform .24s var(--ease);
+}
+.nav-card:hover { background:color-mix(in srgb,var(--c) 22%,transparent); transform:translateY(-2px); }
+.nav-card b { font-family:var(--font-display); font-weight:700; font-size:var(--t-md); color:var(--c); }
+.nav-card small { font-size:var(--t-xs); opacity:.6; }
+.nav-card i { margin-left:auto; color:var(--c); font-style:normal; }
+.nav-sub { margin-top:var(--s-10); display:grid; gap:var(--s-2); }
+.nav-sub a {
+  display:flex; align-items:baseline; gap:var(--s-3);
+  padding:var(--s-3) 0; border-bottom:1px solid rgba(237,243,241,.12);
+  font-size:var(--t-sm);
+}
+.nav-sub em { font-family:var(--font-data); font-style:normal; font-size:.65rem; letter-spacing:.15em; opacity:.45; min-width:6.5em; }
+
+/* ==========================================================================
+   ★セクション ─ 縦はここでくっきり区切る
+   ========================================================================== */
+.sec { padding: var(--s-16) 0; }
+.sec.tint { background: var(--paper-warm); }
+.sec.dark { background: var(--sea-deep); color: var(--foam); }
+.sec.mid  { background: var(--sea-mid);  color: var(--foam); }
+
+/* ★色の帯。縦の区切りを背景色で作る（do-ya? 型）
+   彩度は高いが明度も高いので下品にならない。文字は必ず黒 */
+.sec.sun   { background: var(--band-sun);   color: var(--pop-dark); }
+.sec.coral { background: var(--band-coral); color: var(--pop-dark); }
+.sec.sky   { background: var(--band-sky);   color: var(--pop-dark); }
+.sec.moss  { background: var(--band-moss);  color: var(--pop-dark); }
+
+/* 色帯の中では見出しの色も黒に寄せる（アクセント色が埋もれるため） */
+.sec.sun .sec-en, .sec.coral .sec-en,
+.sec.sky .sec-en, .sec.moss .sec-en { color: var(--pop-dark); }
+.sec.sun .sec-ja, .sec.coral .sec-ja,
+.sec.sky .sec-ja, .sec.moss .sec-ja { color: rgba(7,30,43,.62); }
+.sec.sun .slide-hint, .sec.coral .slide-hint,
+.sec.sky .slide-hint, .sec.moss .slide-hint { color: rgba(7,30,43,.45); }
+
+/* セクション見出し：英語（大）＋日本語のひとこと（小）の二段 */
+.sec-hd { display:flex; align-items:flex-end; gap:var(--s-4); flex-wrap:wrap; }
+.sec-en {
+  font-family: var(--font-data); font-weight: 500;
+  font-size: clamp(1.5rem, 5.5vw, var(--t-lg));
+  letter-spacing: .04em; line-height: 1;
+  color: var(--accent);
+}
+.sec-ja {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--t-sm); color: var(--ink-mid);
+}
+.sec.dark .sec-ja, .sec.mid .sec-ja { color: rgba(237,243,241,.7); }
+/* ★ピル型＋黒枠＋「＞」。do-ya? の「もっと見たい？」と同じ作り */
+.sec-more {
+  margin-left:auto; display:inline-flex; align-items:center; gap:8px;
+  min-height:44px; padding:0 var(--s-5);
+  border:var(--line) solid currentColor; border-radius:var(--r-full);
+  background:#fff; color:var(--pop-dark);
+  font-size:var(--t-xs); font-weight:700;
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.sec-more::after { content:"›"; font-size:1.1em; line-height:1; }
+.sec-more:hover { background:var(--pop-dark); color:var(--pop-light); }
+.sec.dark .sec-more, .sec.mid .sec-more { background:transparent; color:var(--foam); }
+.sec.dark .sec-more:hover, .sec.mid .sec-more:hover { background:var(--foam); color:var(--pop-dark); }
+
+/* ==========================================================================
+   ★★横スライド ─ 縦に延々と並べない（do-ya? の肝）
+   ========================================================================== */
+.slide {
+  margin-top: var(--s-6);
+  display: flex; gap: var(--s-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* 画面端まで流して「まだ続く」感を出す */
+  padding: 0 max(var(--s-4), calc((100vw - var(--wrap)) / 2)) var(--s-4);
+  margin-inline: calc(50% - 50vw);
+}
+.slide::-webkit-scrollbar { display: none; }
+.slide > * { scroll-snap-align: start; flex: 0 0 auto; }
+
+/* スライドの終端に置く「もっと見る」 */
+.slide-end {
+  display: grid; place-items: center;
+  width: 150px; border-radius: var(--r-md);
+  border: var(--line) dashed var(--pop-dark);
+  color: var(--pop-dark); font-weight: 700; font-size: var(--t-sm);
+  text-align: center; line-height: 1.6;
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.slide-end:hover { background: var(--pop-dark); color: var(--pop-light); }
+
+/* 横スクロールできることを示すヒント */
+.slide-hint {
+  margin-top: var(--s-2);
+  font-family: var(--font-data); font-size: .62rem;
+  letter-spacing: .12em; color: var(--ink-faint);
+  display: flex; align-items: center; gap: 6px;
+}
+.sec.dark .slide-hint, .sec.mid .slide-hint { color: rgba(237,243,241,.4); }
+.slide-hint::after { content: "→"; animation: nudge 2.4s ease-in-out infinite; }
+@keyframes nudge { 0%,100%{transform:translateX(0)} 50%{transform:translateX(4px)} }
+
+/* ==========================================================================
+   店舗カード（横スライド用に幅を固定）
+   ========================================================================== */
+/* ★do-ya? の技法：影ではなく「黒い線」で立体感を出す。
+   フラットなのに沈まない＝ポップさの正体。色帯の上でも白が浮く */
+.card {
+  width: 268px;
+  display: flex; flex-direction: column;
+  background: #fff;
+  border: var(--line) solid var(--pop-dark);
+  border-radius: var(--r-md); overflow: hidden;
+  transition: transform .3s var(--ease), border-color .3s var(--ease);
+}
+.card:hover { transform: translateY(-4px); border-color: var(--accent); }
+.card-hit { flex:1; display:block; padding: var(--s-5) var(--s-5) var(--s-4); color: var(--ink); }
+.card-head { display:flex; align-items:center; gap:var(--s-2); flex-wrap:wrap; }
+.tag {
+  font-size:.68rem; padding:3px 9px; border-radius:var(--r-full);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: color-mix(in srgb, var(--accent) 80%, #000); font-weight:700;
+}
+.state { font-family:var(--font-data); font-weight:500; font-size:.62rem; margin-left:auto; }
+.state.open { color:#1F7A4D; }
+.state.closed { color:var(--ink-faint); }
+.card-name { margin-top:var(--s-3); font-size:var(--t-base); line-height:1.5; }
+.card-lead {
+  margin-top:var(--s-2); font-size:.78rem; color:var(--ink-mid); line-height:1.75;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.card-charge {
+  margin-top:var(--s-3); padding:var(--s-2) var(--s-3); border-radius:var(--r-sm);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-family:var(--font-data); font-weight:500; font-size:.68rem;
+  color: color-mix(in srgb, var(--accent) 82%, #000); line-height:1.7;
+}
+.card-sig {
+  margin-top:var(--s-3); display:flex; align-items:baseline; gap:var(--s-2);
+  padding:var(--s-2) var(--s-3); border-radius:var(--r-sm);
+  background:var(--paper-warm); border-left:3px solid var(--accent);
+}
+.card-sig b { font-size:.78rem; }
+.card-sig span { font-family:var(--font-data); font-weight:500; font-size:.72rem; color:var(--accent); margin-left:auto; }
+.card-meta { margin:var(--s-4) 0 0; display:grid; gap:2px; font-size:.7rem; color:var(--ink-mid); }
+.card-meta > div { display:flex; gap:var(--s-2); }
+.card-meta dt { flex:0 0 2.2em; color:var(--ink-faint); }
+.card-meta dd { margin:0; }
+.irr { color:#C98A16; margin-left:.3em; }
+.card-tel {
+  display:flex; align-items:center; justify-content:center; gap:var(--s-2);
+  min-height:48px; padding:var(--s-2);
+  background:var(--accent); color:#fff; font-weight:700; font-size:.8rem;
+}
+.card-tel:hover { filter:brightness(1.1); }
+
+/* ==========================================================================
+   フッタ
+   ========================================================================== */
+.ft { background: var(--sea-deep); color: var(--foam); padding: var(--s-16) 0 var(--s-10); }
+.ft-logo { font-family:var(--font-display); font-weight:var(--w-hero); font-size:var(--t-lg); }
+.ft-sub { margin-top:var(--s-1); font-family:var(--font-data); font-size:.62rem; letter-spacing:.2em; opacity:.45; }
+.ft-nav { margin-top:var(--s-8); display:grid; gap:var(--s-2); max-width:26rem; }
+.ft-nav a {
+  display:flex; align-items:baseline; gap:var(--s-3);
+  padding:var(--s-3) 0; border-bottom:1px solid rgba(237,243,241,.12); font-size:var(--t-sm);
+}
+.ft-nav em { font-family:var(--font-data); font-style:normal; font-size:.62rem; letter-spacing:.14em; opacity:.45; min-width:7em; }
+.ft-note { margin-top:var(--s-10); font-size:.68rem; opacity:.42; line-height:2; }
+.ft-copy { margin-top:var(--s-6); font-family:var(--font-data); font-size:.6rem; opacity:.3; }
+
+/* ==========================================================================
+   ホーム（浮きの分岐画面）
+   ========================================================================== */
+.sea {
+  position:relative; min-height:100svh; display:grid;
+  grid-template-rows:auto 1fr auto; overflow:hidden;
+  background:
+    radial-gradient(120% 80% at 50% 0%, var(--sea-shallow) 0%, transparent 60%),
+    linear-gradient(180deg, var(--sea-mid) 0%, var(--sea-deep) 70%);
+}
+.waves { position:absolute; inset:0; pointer-events:none; opacity:.5; }
+.wave { position:absolute; left:-50%; width:200%; height:40vh; border-radius:44%;
+  background:rgba(53,168,201,.07); animation:drift linear infinite; }
+.wave1 { top:22%; animation-duration:26s; }
+.wave2 { top:38%; animation-duration:38s; animation-direction:reverse; background:rgba(111,203,176,.05); }
+.wave3 { top:56%; animation-duration:52s; background:rgba(47,98,170,.08); }
+@keyframes drift { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+.masthead { position:relative; z-index:2; padding:var(--s-10) var(--s-6) 0; text-align:center; }
+.logo-ja { font-family:var(--font-display); font-weight:var(--w-hero);
+  font-size:clamp(2.1rem,8vw,3.2rem); letter-spacing:.06em; color:var(--foam);
+  text-shadow:0 2px 24px rgba(0,0,0,.35); display:block; }
+.logo-en { font-family:var(--font-data); font-weight:500; font-size:var(--t-xs);
+  letter-spacing:.42em; text-indent:.42em; color:var(--foam); opacity:.55; display:block; margin-top:2px; }
+.tagline { margin-top:var(--s-3); font-size:var(--t-xs); letter-spacing:.22em; color:var(--foam); opacity:.6; }
+
+.buoys { position:relative; z-index:2; display:flex; flex-wrap:wrap;
+  align-content:center; justify-content:center; gap:var(--s-4); padding:var(--s-8) var(--s-6); }
+.buoy { position:relative; display:grid; place-items:center;
+  width:clamp(118px,26vw,164px); aspect-ratio:1;
+  min-width:var(--tap); min-height:var(--tap); border-radius:var(--r-full);
+  background:radial-gradient(circle at 34% 28%, rgba(255,255,255,.5) 0%, transparent 42%), var(--c);
+  box-shadow:inset 0 -10px 24px rgba(0,0,0,.24), 0 10px 30px rgba(0,0,0,.32);
+  color:#fff; text-align:center; transition:filter .35s var(--ease);
+  will-change:transform; touch-action:none; }
+.buoy::after { content:""; position:absolute; left:6%; right:6%; top:50%;
+  height:2px; background:rgba(0,0,0,.16); border-radius:2px; }
+.buoy-body { position:relative; z-index:1; display:flex; flex-direction:column;
+  gap:2px; padding:var(--s-2); pointer-events:none; }
+.buoy-label { font-family:var(--font-display); font-weight:700;
+  font-size:clamp(1.05rem,3.6vw,1.3rem); letter-spacing:.04em; text-shadow:0 1px 8px rgba(0,0,0,.3); }
+.buoy-note { font-size:.66rem; line-height:1.5; opacity:.92; text-shadow:0 1px 6px rgba(0,0,0,.35); }
+.buoy-soon { margin-top:3px; font-family:var(--font-data); font-weight:500; font-size:.6rem;
+  letter-spacing:.1em; padding:1px 7px; border-radius:var(--r-full); background:rgba(0,0,0,.26); }
+.buoy:hover,.buoy:focus-visible { filter:brightness(1.12); }
+.buoy.soon { opacity:.72; }
+
+.seabed { position:relative; z-index:2; padding:0 var(--s-6) var(--s-8); text-align:center; color:var(--foam); }
+.hint { font-size:var(--t-sm); opacity:.78; display:flex; align-items:center; justify-content:center; gap:var(--s-2); }
+.hint-mark { display:inline-block; animation:bob 3.2s ease-in-out infinite; opacity:.6; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+.credit { margin-top:var(--s-2); font-family:var(--font-data); font-weight:500; font-size:.65rem; letter-spacing:.2em; opacity:.35; }
+.home-note { margin-top:var(--s-3); font-size:.6rem; opacity:.3; line-height:1.8; }
+
+.flood { position:fixed; inset:0; z-index:50; pointer-events:none;
+  background:var(--flood, var(--c-eat));
+  clip-path:circle(0% at var(--fx,50%) var(--fy,50%));
+  transition:clip-path .62s var(--ease); }
+.flood.on { clip-path:circle(150% at var(--fx,50%) var(--fy,50%)); }
+@media (prefers-reduced-motion: reduce) { .wave,.hint-mark { animation:none; } }
+
+/* ==========================================================================
+   カテゴリページの導入部（ヒーロー）
+   ========================================================================== */
+.hero { padding: var(--s-12) 0 var(--s-16); background: var(--sea-deep); color: var(--foam); position:relative; overflow:hidden; }
+.hero::before {
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(90% 60% at 18% 0%, color-mix(in srgb, var(--accent) 30%, transparent) 0%, transparent 62%);
+}
+.hero > * { position:relative; }
+.hero-en { font-family:var(--font-data); font-weight:500; font-size:var(--t-xs); letter-spacing:.34em; color:var(--accent); }
+.hero-h { margin-top:var(--s-3); font-size:clamp(2rem,8vw,var(--t-xl)); line-height:1.32; }
+.hero-lead { margin-top:var(--s-5); font-size:var(--t-sm); line-height:2.05; opacity:.82; max-width:34em; }
+.hero-stat { margin-top:var(--s-8); display:flex; align-items:baseline; gap:var(--s-3); flex-wrap:wrap; }
+.hero-num { font-family:var(--font-data); font-weight:500; font-size:clamp(2.4rem,9vw,var(--t-2xl)); line-height:1; color:var(--accent); }
+.hero-unit { font-family:var(--font-display); font-weight:700; font-size:var(--t-md); }
+.hero-of { font-size:var(--t-sm); opacity:.55; }
+.hero-caveat { margin-top:var(--s-4); font-size:var(--t-xs); opacity:.5; line-height:1.9; }
+
+/* ==========================================================================
+   料金の横並び（飲む）
+   ========================================================================== */
+.price { margin-top:var(--s-6); border-top:1px solid rgba(237,243,241,.18); }
+.price-row { display:grid; grid-template-columns:minmax(9em,auto) 1fr auto;
+  gap:var(--s-2) var(--s-4); align-items:baseline; padding:var(--s-4) 0;
+  border-bottom:1px solid rgba(237,243,241,.14); }
+.price-name { font-family:var(--font-display); font-weight:700; }
+.price-name:hover { color:var(--accent); }
+.price-val { font-family:var(--font-data); font-weight:500; font-size:var(--t-sm); color:var(--accent); }
+.price-where { font-size:var(--t-xs); opacity:.45; white-space:nowrap; }
+@media (max-width:560px) { .price-row { grid-template-columns:1fr; gap:2px; } }
+
+/* 同じ建物カード */
+.bld { width:230px; padding:var(--s-5); border-radius:var(--r-md);
+  background:rgba(7,30,43,.5); border:1px solid rgba(237,243,241,.14); }
+.bld-name { font-family:var(--font-data); font-weight:500; font-size:var(--t-xs); letter-spacing:.1em; color:var(--accent); }
+.bld-list { margin-top:var(--s-3); display:grid; gap:var(--s-2); }
+.bld-list a { display:flex; align-items:baseline; gap:var(--s-2);
+  padding:var(--s-2) 0; border-bottom:1px solid rgba(237,243,241,.1); }
+.bld-list a:hover b { color:var(--accent); }
+.bld-list b { font-weight:700; font-size:var(--t-sm); }
+.bld-list small { font-size:var(--t-xs); opacity:.5; margin-left:auto; }
+
+/* ==========================================================================
+   絞り込み（全件一覧セクション）
+   ========================================================================== */
+.tools { margin-top:var(--s-6); display:flex; gap:var(--s-3); flex-wrap:wrap; align-items:center; }
+.chips { display:flex; gap:var(--s-2); flex-wrap:wrap; }
+.chip {
+  display:inline-flex; align-items:center; gap:var(--s-2);
+  min-height:44px; padding:0 var(--s-4); border-radius:var(--r-full);
+  border:1px solid rgba(20,35,43,.16); font-size:var(--t-sm);
+  font-weight:var(--w-body); background:#fff;
+  transition:border-color .2s var(--ease), color .2s var(--ease), background .2s var(--ease);
+}
+.chip:hover { border-color:var(--accent); color:var(--accent); }
+.chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+.chip-n { font-family:var(--font-data); font-weight:500; font-size:.78em; opacity:.72; }
+.toggle { display:inline-flex; align-items:center; gap:var(--s-2); min-height:44px;
+  cursor:pointer; font-size:var(--t-sm); margin-left:auto; user-select:none; }
+.toggle input { position:absolute; opacity:0; width:0; height:0; }
+.toggle-box { width:44px; height:26px; border-radius:var(--r-full);
+  background:rgba(20,35,43,.16); position:relative; transition:background .25s var(--ease); flex:none; }
+.toggle-box::after { content:""; position:absolute; top:3px; left:3px; width:20px; height:20px;
+  border-radius:var(--r-full); background:#fff; transition:transform .25s var(--ease); }
+.toggle input:checked + .toggle-box { background:var(--accent); }
+.toggle input:checked + .toggle-box::after { transform:translateX(18px); }
+.count { margin-top:var(--s-4); font-family:var(--font-data); font-weight:500;
+  font-size:var(--t-xs); color:var(--ink-faint); letter-spacing:.06em; }
+
+/* 全件はグリッド（ここだけ縦に積む。探しに来た人向け） */
+.grid { margin-top:var(--s-3); display:grid; gap:var(--s-4);
+  grid-template-columns:repeat(auto-fill,minmax(268px,1fr)); }
+.grid .card { width:auto; }
+.empty { margin-top:var(--s-12); text-align:center; color:var(--ink-mid); font-size:var(--t-sm); }
+
+/* ==========================================================================
+   掲載のお願い
+   ========================================================================== */
+.ask { padding:var(--s-8); border-radius:var(--r-md);
+  border:2px dashed color-mix(in srgb, var(--accent) 34%, transparent); text-align:center; }
+.ask h2 { font-size:var(--t-md); }
+.ask p { margin-top:var(--s-3); color:var(--ink-mid); font-size:var(--t-sm); line-height:1.9; }
+.btn { display:inline-flex; align-items:center; min-height:var(--tap);
+  margin-top:var(--s-4); padding:0 var(--s-8); border-radius:var(--r-full);
+  background:var(--accent); color:#fff; font-weight:700; }
+.btn:hover { filter:brightness(1.1); }
+
+/* ==========================================================================
+   店舗ページ
+   ========================================================================== */
+.crumb { display:flex; align-items:center; gap:var(--s-2); font-size:var(--t-xs); color:var(--ink-faint); }
+.crumb a { color:var(--accent); }
+.also { margin-top:var(--s-4); font-size:var(--t-xs); color:var(--ink-faint);
+  display:flex; align-items:center; gap:var(--s-2); flex-wrap:wrap; }
+.also-link { padding:3px 11px; border-radius:var(--r-full); border:1.5px solid var(--c); color:var(--c); font-weight:700; }
+
+.charge { margin-top:var(--s-8); padding:var(--s-6); border-radius:var(--r-md); background:var(--sea-deep); color:var(--foam); }
+.charge-label { font-family:var(--font-data); font-weight:500; font-size:var(--t-xs); letter-spacing:.3em; color:var(--accent); }
+.charge-val { margin-top:var(--s-2); font-family:var(--font-display); font-weight:700;
+  font-size:clamp(1.15rem,4.4vw,var(--t-md)); line-height:1.6; }
+.charge-note { margin-top:var(--s-3); font-size:var(--t-xs); opacity:.45; }
+
+.sig { margin-top:var(--s-6); padding:var(--s-6); border-radius:var(--r-md);
+  background:var(--paper-warm); border-left:4px solid var(--accent);
+  display:flex; align-items:baseline; gap:var(--s-4); flex-wrap:wrap; }
+.sig-label { font-family:var(--font-data); font-weight:500; font-size:var(--t-xs); letter-spacing:.28em; color:var(--accent); }
+.sig-item { font-family:var(--font-display); font-weight:700; font-size:var(--t-md); }
+.sig-price { font-family:var(--font-data); font-weight:500; font-size:var(--t-md); color:var(--accent); margin-left:auto; }
+
+.warn { margin-top:var(--s-6); display:flex; align-items:flex-start; gap:var(--s-3);
+  padding:var(--s-4); border-radius:var(--r-sm); background:#FFF7E8; border:1px solid #E9C97A;
+  font-size:var(--t-sm); line-height:1.8; }
+.warn-mark { flex:none; width:22px; height:22px; border-radius:var(--r-full);
+  background:#C98A16; color:#fff; display:grid; place-items:center;
+  font-family:var(--font-data); font-weight:700; font-size:.8rem; }
+
+.facts { margin-top:var(--s-6); display:grid; gap:1px;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  background:rgba(20,35,43,.1); border:1px solid rgba(20,35,43,.1);
+  border-radius:var(--r-md); overflow:hidden; }
+.fact { background:#fff; padding:var(--s-4); }
+.fact-key { font-size:var(--t-xs); color:var(--ink-faint); letter-spacing:.1em; }
+.fact-val { margin-top:var(--s-1); font-weight:700; font-size:var(--t-sm); line-height:1.6; }
+.fact-val.ok { color:#1F7A4D; }
+.fact-val.ng { color:var(--ink-faint); }
+
+.notes { margin-top:var(--s-4); display:grid; gap:var(--s-3); }
+.note { display:flex; gap:var(--s-4); padding:var(--s-3) var(--s-4);
+  border-radius:var(--r-sm); background:var(--paper-warm); font-size:var(--t-sm); }
+.note-key { flex:0 0 4.5em; color:var(--ink-faint); font-size:var(--t-xs); letter-spacing:.1em; padding-top:2px; }
+.note-val { line-height:1.8; }
+
+.acts { margin-top:var(--s-6); display:grid; gap:var(--s-3);
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+.act { display:flex; align-items:center; gap:var(--s-3); min-height:68px;
+  padding:var(--s-3) var(--s-5); border-radius:var(--r-md);
+  border:1.5px solid rgba(20,35,43,.14); background:#fff; font-weight:700;
+  transition:border-color .2s var(--ease), transform .2s var(--ease); }
+.act:hover { border-color:var(--accent); transform:translateY(-2px); }
+.act-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.act-primary:hover { filter:brightness(1.1); }
+.act-ico { font-size:1.3rem; opacity:.85; }
+.act-txt { display:flex; flex-direction:column; line-height:1.4; }
+.act-sub { font-weight:500; font-size:var(--t-xs); opacity:.72; }
+
+.nb-grid { margin-top:var(--s-4); display:grid; gap:var(--s-3);
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+.nb-card { display:flex; flex-direction:column; gap:3px; padding:var(--s-4);
+  border-radius:var(--r-md); border:1px solid rgba(20,35,43,.12); background:#fff;
+  transition:border-color .2s var(--ease), transform .2s var(--ease); }
+.nb-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+.nb-name { font-family:var(--font-display); font-weight:700; }
+.nb-sub { font-size:var(--t-xs); color:var(--ink-faint); }
+.nb-charge { margin-top:var(--s-2); font-family:var(--font-data); font-weight:500;
+  font-size:var(--t-xs); color:var(--accent); }
+
+.fix { margin-top:var(--s-12); padding:var(--s-4); border-radius:var(--r-sm);
+  background:var(--paper-warm); font-size:var(--t-xs); color:var(--ink-mid); text-align:center; }
+.fix a { color:var(--accent); font-weight:700; text-decoration:underline; }
+
+/* ==========================================================================
+   準備中
+   ========================================================================== */
+.soon-box { padding:var(--s-8); border-radius:var(--r-md);
+  background:linear-gradient(135deg, color-mix(in srgb,var(--accent) 10%,#fff), var(--paper-warm));
+  border:1px solid color-mix(in srgb,var(--accent) 22%,transparent); }
+.soon-num { font-family:var(--font-data); font-weight:500; font-size:var(--t-lg); color:var(--accent); }
+.plans { margin-top:var(--s-6); display:grid; gap:var(--s-2); }
+.plans li { position:relative; padding-left:1.4em; font-size:var(--t-sm); line-height:1.9; }
+.plans li::before { content:""; position:absolute; left:0; top:.72em; width:8px; height:8px;
+  border-radius:var(--r-full); background:var(--accent); }
+
+@media (max-width:560px) {
+  .toggle { margin-left:0; }
+  .sec { padding: var(--s-12) 0; }
+}
+
+/* ==========================================================================
+   ★do-ya? から借りた「黒 × 黄」の部品
+   --------------------------------------------------------------------------
+   明度差が極端なので黄が発光して見える。警戒色の組み合わせで本能的に目を引く。
+   ★ただし面積を絞って使う。帯・バッジ・ボタンだけ。全面には広げない。
+   ========================================================================== */
+
+/* 流れる黒帯（do-ya? のトップにある横スクロールの帯） */
+.ticker {
+  background: var(--pop-dark);
+  color: var(--pop-light);
+  padding: var(--s-3) 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ticker-in {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-sm);
+  letter-spacing: .04em;
+  animation: flow 28s linear infinite;
+  will-change: transform;
+}
+.ticker-in span { padding-inline: var(--s-6); }
+@keyframes flow { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+@media (prefers-reduced-motion: reduce) {
+  .ticker-in { animation: none; }
+  .ticker { white-space: normal; text-align: center; }
+}
+
+/* 黒い吹き出し（色帯の上に重ねてコントラストを跳ねさせる） */
+.bubble {
+  position: relative;
+  display: inline-block;
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-md);
+  background: var(--pop-dark);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-sm);
+}
+.bubble::after {
+  content: "";
+  position: absolute; left: var(--s-6); bottom: -9px;
+  border: 5px solid transparent;
+  border-top: 10px solid var(--pop-dark);
+  border-bottom: 0;
+}
+
+/* 黒地に黄文字のバッジ（いちばん目を引かせたい一語に使う） */
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: var(--r-full);
+  background: var(--pop-dark); color: var(--pop-light);
+  font-family: var(--font-data); font-weight: 500;
+  font-size: .68rem; letter-spacing: .1em;
+}
+
+/* 黄の下線マーカー（見出しに引く。do-ya? の特集見出しと同じ考え方） */
+.marker {
+  background: linear-gradient(transparent 62%, var(--pop-light) 62%);
+  padding-inline: 2px;
+}
+
+/* セクション見出しのタブ（色帯の上端に差し込む） */
+.sec-tab {
+  display: inline-block;
+  padding: var(--s-2) var(--s-5);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  background: var(--band-sun);
+  color: var(--pop-dark);
+  font-family: var(--font-display); font-weight: var(--w-hero);
+  font-size: var(--t-md);
+}
+
+/* 色帯の上に料金表を置いたときの調整 */
+.sec.sun .price { border-top-color: rgba(7,30,43,.28); }
+.sec.sun .price-row { border-bottom-color: rgba(7,30,43,.22); }
+.sec.sun .price-val { color: var(--pop-dark); font-weight: 700; }
+.sec.sun .price-where { opacity: .55; }
+.sec.sun .price-name:hover { opacity: .6; color: var(--pop-dark); }
+
+/* ==========================================================================
+   ★背景イラスト（do-ya? の仕組みを踏襲）
+   --------------------------------------------------------------------------
+   横長のイラストを薄く敷き、ゆっくり動かす。
+   ・余白が多くても間が持つ。むしろ余白が背景を見せる場所になる
+   ・白いセクションの「裏」に見えるので、帯とのリズムが生まれる
+   ・透過を強めにして、文字の可読性を絶対に落とさない
+   ========================================================================== */
+
+.bgwrap {
+  position: fixed;
+  inset: 0;
+  z-index: -1;            /* すべての中身より後ろ */
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--paper);
+}
+
+.bgwrap::before {
+  content: "";
+  position: absolute;
+  /* 画面より広く取って、動かしても端が見えないようにする */
+  top: -6%; left: -12%;
+  width: 124%; height: 112%;
+  background-image: image-set(
+    url("img/bg.webp") type("image/webp"),
+    url("img/bg.jpg")  type("image/jpeg")
+  );
+  background-image: url("img/bg.jpg");  /* image-set 非対応の保険 */
+  background-image: -webkit-image-set(
+    url("img/bg.webp") type("image/webp"),
+    url("img/bg.jpg")  type("image/jpeg")
+  );
+  background-repeat: no-repeat;
+  background-position: center 28%;
+  background-size: cover;
+  opacity: .30;           /* ★これ以上濃くすると文字が読みにくくなる */
+  animation: bgdrift 90s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* ゆっくり、ランダムに見える動き。往復させて不自然な戻りを消す */
+@keyframes bgdrift {
+  0%   { transform: translate3d(0, 0, 0) scale(1.00); }
+  25%  { transform: translate3d(-1.6%, .8%, 0) scale(1.03); }
+  50%  { transform: translate3d(-.6%, -1.2%, 0) scale(1.05); }
+  75%  { transform: translate3d(1.4%, .4%, 0) scale(1.02); }
+  100% { transform: translate3d(.4%, -.8%, 0) scale(1.00); }
+}
+
+/* 上下を紙色でぼかして、イラストの切れ目を目立たせない */
+.bgwrap::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    180deg,
+    var(--paper) 0%,
+    rgba(251,250,246,0) 22%,
+    rgba(251,250,246,0) 74%,
+    var(--paper) 100%
+  );
+}
+
+/* 動きを減らす設定では止める */
+@media (prefers-reduced-motion: reduce) {
+  .bgwrap::before { animation: none; }
+}
+
+/* 画面が狭いときは、より寄せて人物が見えるように */
+@media (max-width: 720px) {
+  .bgwrap::before {
+    background-position: 62% 26%;
+    background-size: 190% auto;
+    opacity: .26;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   セクションを「半透明の紙」にして、背景をところどころ透かす
+   ★白ベタで塗りつぶすと背景が死ぬ。ここが do-ya? の肝
+   -------------------------------------------------------------------------- */
+.sec { background: transparent; }              /* 既定は透かす */
+.sec.paper { background: rgba(251,250,246,.86); }   /* 読ませたい場所だけ紙を敷く */
+.sec.tint  { background: rgba(244,240,230,.88); }
+
+/* 色帯・濃色帯は不透明のまま（ここで背景を区切る） */
+.sec.sun   { background: var(--band-sun); }
+.sec.coral { background: var(--band-coral); }
+.sec.sky   { background: var(--band-sky); }
+.sec.moss  { background: var(--band-moss); }
+.sec.dark  { background: var(--sea-deep); }
+.sec.mid   { background: var(--sea-mid); }
+
+/* ヘッダーも背景を透かす */
+.hd { background: rgba(251,250,246,.82); }
+
+/* --------------------------------------------------------------------------
+   ヒーローは濃色なので、背景イラストの上でも成立する。
+   ただし完全な不透明にせず、わずかに透かして背景と地続きにする
+   -------------------------------------------------------------------------- */
+.hero { background: rgba(7,30,43,.94); }
+
+/* ★背景を「見せるためだけ」の余白セクション。
+   コンテンツを置かず、イラストを鑑賞させる。do-ya? が余白で間を持たせている部分 */
+.sec.air { min-height: 34vh; padding: 0; background: transparent; }
+
+/* 紙のセクションどうしが隣り合うと境目が消えるので、薄く線を入れる */
+.sec.paper + .sec.paper { border-top: 1px solid rgba(20,35,43,.07); }
+
+/* ==========================================================================
+   ★背景イラスト（do-ya? の動きを実測して再現）
+   --------------------------------------------------------------------------
+   画面録画から測定した do-ya? の挙動：
+     ・水平：右へ 約21px/秒 の一定速度で無限ループ
+     ・垂直：周期 約7〜8秒 で上下にゆらぐ（振幅 約30px）
+     ・透過：opacity 約0.12（かなり薄い）
+     ・スクロールしても背景は追従しない＝画面に固定
+   1200px幅の絵を21px/秒で流すと 約57秒で一周する。
+   ========================================================================== */
+
+/* ★body より後ろに敷く。html に地の色を持たせ、body は透明にする
+   （body に背景色があると z-index:-1 のレイヤーが隠れてしまう） */
+html { background: var(--paper); }
+
+/* ★3層に分ける理由
+   ① .bgart      … 画面に固定する枠（position:fixed）
+                    ※ fixed に transform をかけると固定が壊れるので、動かさない
+   ② .bgart-sway … 縦のゆらぎ担当（transform:translate3d の Y だけ）
+   ③ ::before    … 横の流れ担当（transform:translate3d の X だけ）
+
+   transform は1要素に1つしか持てないので、縦横で層を分ける。
+   margin-top で動かすと毎フレーム再レイアウトが走り、
+   1pxずつカクついて「微細な縦ブレ」になる。transform ならGPUで滑らかに動く。 */
+
+.bgart {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* 中身は背景より前に出す */
+body > *:not(.bgart) { position: relative; z-index: 1; }
+
+.bgart-sway {
+  position: absolute;
+  /* ゆらぎの振れ幅ぶん、上下にはみ出させておく */
+  top: -40px; bottom: -40px; left: 0; right: 0;
+  animation: bgsway 10s ease-in-out infinite alternate;
+  animation-delay: var(--bg-delay, 0s);
+  will-change: transform;
+}
+
+.bgart-sway::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  /* ★開くたびに違う場所から始める（JSが --bg-start を入れる） */
+  left: var(--bg-start, 0px);
+  /* 画像を横に3枚ぶん敷く。始点をずらしても右側が途切れない */
+  width: 7317px;
+  background-image: url("img/bg-tile.webp");
+  background-repeat: repeat-x;
+  /* ★高さ基準。画面の高さいっぱいに絵を敷く。
+     幅基準にすると絵が小さく収まり、「背景」ではなく「絵を眺める」状態に
+     なってしまう。人物が等身大に近く、街の中にいる感覚を出すのが狙い。 */
+  background-size: auto 100%;
+  background-position: 0 center;
+  opacity: .18;   /* do-ya?の実測値は.12だが、この絵は線が細いので.18に */
+  animation: bgflow 200s linear infinite;   /* ゆっくり流す */
+  will-change: transform;
+}
+
+
+/* webp が使えない環境向け */
+.no-webp .bgart-sway::before { background-image: url("img/bg-tile.jpg"); }
+
+/* 絵1枚ぶん流して先頭に戻る＝継ぎ目が出ない */
+@keyframes bgflow {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-2439px, 0, 0); }
+}
+@keyframes bgsway {
+  from { transform: translate3d(0, 12px, 0); }
+  to   { transform: translate3d(0, -12px, 0); }   /* 振幅 ±12px。控えめに */
+}
+
+/* 動きを減らす設定では止める（酔い防止・高齢化率43.8%の街なので） */
+@media (prefers-reduced-motion: reduce) {
+  .bgart-sway, .bgart-sway::before { animation: none; }
+}
+
+/* 濃い背景のセクションでは、その下の背景を隠す */
+.sec.dark, .sec.mid, .hero, .ft, .ticker { position: relative; }
+
+/* 白セクションは背景を透かす（do-ya? の「余白で背景を楽しませる」） */
+.sec:not(.dark):not(.mid):not(.sun):not(.coral):not(.sky):not(.moss) {
+  background: transparent;
+}
+/* 色帯は不透明のまま＝背景が消えて区切りが立つ */
+
+/* ホームは海のグラデーションが背景なので、イラストは出さない */
+body.no-bgart .bgart { display: none; }
+/* ホームは海のグラデーションなので地の色も濃紺に */
+html:has(body.dark) { background: var(--sea-deep); }
+
+/* ==========================================================================
+   ★★ do-ya? 踏襲レイヤー v1
+   --------------------------------------------------------------------------
+   2026/8/27 実機スクリーンショット（1180×2556）から実測した値を、
+   色を変えずにそのまま採り入れた上書き層。
+
+   ここから下だけを削除すれば、直前の枕崎オリジナル配色に完全に戻ります。
+   （上書きしているだけで、元の記述は一行も消していません）
+
+   実測値
+     黄  #FFC41C   ※以前のメモの #FCC81E は目視誤差。実測はこちら
+     黒  #000000   ※#0D0D0D ではなく純黒
+     桃  #FE9696
+     空  #92ECFF
+     氷  #EFF8FA（イラストの地）
+   ========================================================================== */
+
+:root {
+  --dy-black:  #000000;
+  --dy-yellow: #FFC41C;
+  --dy-white:  #FFFFFF;
+  --dy-pink:   #FE9696;
+  --dy-sky:    #92ECFF;
+  --dy-ice:    #EFF8FA;
+  --dy-peach:  #F9E6DD;
+
+  /* 役割に割り当て直す */
+  --ink:        #000000;
+  --ink-mid:    #5A5A5A;
+  --ink-faint:  #8C8C8C;
+  --paper:      #FFFFFF;
+  --paper-warm: #EFF8FA;
+  --pop-dark:   #000000;
+  --pop-light:  #FFC41C;
+  --band-sun:   #FFC41C;
+  --band-coral: #FE9696;
+  --band-sky:   #92ECFF;
+  --band-moss:  #EFF8FA;
+
+  /* 英語の巨大見出し用。丸い幾何学サンセリフ（do-ya? の "Article" と同系） */
+  --font-en: "Quicksand", "Zen Maru Gothic", sans-serif;
+
+  --line:   2px;
+  --r-band: 28px;   /* 色帯の上角 */
+  --r-card: 16px;
+}
+
+/* --- 地は白。イラストが透ける ------------------------------------------- */
+html { background: var(--dy-white); }
+
+/* ==========================================================================
+   ヘッダー ─ 白地／黒ロゴ／黒い正円の MENU に黄文字
+   ========================================================================== */
+.hd {
+  height: 64px;
+  background: var(--dy-white);
+  backdrop-filter: none;
+  border-bottom: 0;
+}
+.hd-logo b { color: var(--dy-black); }
+.hd-logo span { color: var(--dy-black); opacity: .45; }
+
+.hd-now {
+  background: var(--dy-yellow); color: var(--dy-black);
+  font-weight: 700; padding: 5px 12px;
+}
+
+/* ★ do-ya? の MENU：黒い正円、黄色のハンバーガー＋MENU の二段 */
+.hd-menu {
+  width: 56px; height: 56px; min-height: 0; padding: 0;
+  flex-direction: column; gap: 4px;
+  border-radius: 50%;
+  background: var(--dy-black); color: var(--dy-yellow);
+  font-family: var(--font-en); font-weight: 700;
+  font-size: .58rem; letter-spacing: .04em;
+}
+.hd-menu:hover { filter: none; transform: scale(1.04); }
+.hd-menu-bars { gap: 3.5px; }
+.hd-menu-bars i { width: 20px; height: 2.5px; }
+
+/* ==========================================================================
+   全画面メニュー ─ 白地・黒文字。閉じるは黒い正円＋CLOSE
+   ========================================================================== */
+.nav { background: var(--dy-white); color: var(--dy-black); }
+.nav-close {
+  width: 56px; height: 56px; min-height: 0; padding: 0;
+  flex-direction: column; gap: 2px;
+  border: 0; border-radius: 50%;
+  background: var(--dy-black); color: var(--dy-yellow);
+  font-family: var(--font-en); font-weight: 700; font-size: .56rem;
+}
+.nav-lead {
+  display: inline-block;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: .82rem; letter-spacing: 0; opacity: 1;
+  background: var(--dy-yellow); color: var(--dy-black);
+  padding: 9px 17px; border-radius: 999px;
+}
+.nav-card {
+  background: var(--dy-white);
+  border: var(--line) solid var(--dy-black);
+  border-radius: var(--r-card);
+}
+.nav-card:hover { background: var(--dy-yellow); transform: translateY(-2px); }
+.nav-card b { color: var(--dy-black); }
+.nav-card small { color: var(--ink-mid); opacity: 1; }
+.nav-card i { color: var(--dy-black); }
+.nav-sub a { border-bottom: 1px solid rgba(0,0,0,.14); }
+.nav-sub em {
+  font-family: var(--font-en); font-weight: 700;
+  font-size: .84rem; letter-spacing: .05em; opacity: 1; color: var(--dy-black);
+}
+.nav-sub a span { color: var(--ink-mid); }
+
+/* ==========================================================================
+   ★ セクション見出しの公式（do-ya? の型をそのまま）
+     ① 黄色いピルに日本語のひとこと
+     ② その下に、巨大な英語（丸い書体）
+     ③ 右下に「もっと見る」のピル
+   ========================================================================== */
+.sec-hd {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "pill pill" "en more";
+  gap: 12px 12px;
+  align-items: end;
+}
+.sec-ja {
+  grid-area: pill; justify-self: start;
+  position: relative;
+  display: inline-block;
+  background: var(--dy-yellow); color: var(--dy-black);
+  font-family: var(--font-display); font-weight: 700;
+  font-size: .82rem; line-height: 1;
+  padding: 10px 18px; border-radius: 999px;
+}
+.sec-en {
+  grid-area: en;
+  font-family: var(--font-en); font-weight: 700;
+  font-size: clamp(2.4rem, 11vw, 4rem);
+  letter-spacing: .01em; line-height: .92;
+  color: var(--dy-black);
+  /* ALL CAPS のラベルを do-ya? 風の Title case に見せる */
+  text-transform: lowercase;
+}
+.sec-en::first-letter { text-transform: uppercase; }
+
+.sec-more {
+  grid-area: more; margin-left: 0; align-self: end;
+  border-color: var(--dy-black); color: var(--dy-black);
+  background: var(--dy-white);
+  border-radius: 999px; padding: 0 var(--s-5); min-height: 48px;
+}
+.sec-more:hover { background: var(--dy-black); color: var(--dy-yellow); }
+
+/* ==========================================================================
+   色帯 ─ 上角を丸める／文字は必ず黒／白い区間で休ませる
+   ========================================================================== */
+.sec.sun, .sec.coral, .sec.sky, .sec.moss, .sec.dark, .sec.mid {
+  border-radius: var(--r-band) var(--r-band) 0 0;
+}
+.sec.sun   { background: var(--dy-yellow); color: var(--dy-black); }
+.sec.coral { background: var(--dy-pink);   color: var(--dy-black); }
+.sec.sky   { background: var(--dy-sky);    color: var(--dy-black); }
+.sec.moss  { background: var(--dy-ice);    color: var(--dy-black); }
+.sec.dark, .sec.mid { background: var(--dy-black); color: var(--dy-white); }
+.sec.tint  { background: var(--dy-ice); }
+
+.sec.sun .sec-en, .sec.coral .sec-en,
+.sec.sky .sec-en, .sec.moss .sec-en { color: var(--dy-black); }
+.sec.dark .sec-en, .sec.mid .sec-en { color: var(--dy-white); }
+
+/* 黄の帯の上では、黄色いピルが沈む。
+   → 黒地＋黄文字＋しっぽ に反転する＝これが do-ya? の黒い吹き出し */
+.sec.sun .sec-ja {
+  background: var(--dy-black); color: var(--dy-yellow);
+}
+.sec.sun .sec-ja::after {
+  content: ""; position: absolute; left: 24px; bottom: -9px;
+  border: 10px solid transparent; border-bottom: 0;
+  border-top-color: var(--dy-black);
+}
+.sec.coral .sec-ja, .sec.sky .sec-ja, .sec.moss .sec-ja,
+.sec.dark .sec-ja, .sec.mid .sec-ja {
+  background: var(--dy-yellow); color: var(--dy-black);
+}
+.sec.dark .sec-more, .sec.mid .sec-more {
+  background: var(--dy-white); color: var(--dy-black); border-color: var(--dy-white);
+}
+.sec.dark .sec-more:hover, .sec.mid .sec-more:hover {
+  background: var(--dy-yellow); color: var(--dy-black);
+}
+.sec.sun .slide-hint, .sec.coral .slide-hint,
+.sec.sky .slide-hint, .sec.moss .slide-hint { color: rgba(0,0,0,.45); }
+
+/* ==========================================================================
+   カード ─ 白地＋黒2px枠＋角丸。影ではなく線で立体感を出す
+   ========================================================================== */
+.card {
+  border-color: var(--dy-black);
+  border-radius: var(--r-card);
+}
+.card:hover { border-color: var(--dy-black); transform: translateY(-4px); }
+.card-hit { color: var(--dy-black); }
+
+.tag {
+  background: transparent; color: var(--dy-black);
+  font-family: var(--font-en); font-weight: 700;
+  font-size: .64rem; letter-spacing: .1em; padding: 3px 0;
+  text-transform: uppercase;
+}
+/* 「今日は営業日」を黄色いピルにする＝カードの中で一番目を引く */
+.state { margin-left: auto; font-family: var(--font-body); font-weight: 700; font-size: .62rem; }
+.state.open   { background: var(--dy-yellow); color: var(--dy-black); padding: 4px 10px; border-radius: 999px; }
+.state.closed { color: var(--ink-faint); }
+
+.card-lead { color: var(--ink-mid); }
+.card-charge {
+  background: rgba(255,196,28,.32); color: var(--dy-black);
+  border-radius: 10px;
+}
+.card-sig { background: var(--dy-ice); border-left-color: var(--dy-black); border-radius: 10px; }
+.card-sig span { color: var(--dy-black); }
+.card-meta { color: var(--ink-mid); }
+.card-meta dt { color: var(--ink-faint); }
+
+/* ★黒地×黄文字。サイトで最も押してほしいボタンにだけ使う */
+.card-tel {
+  background: var(--dy-black); color: var(--dy-yellow);
+  border-top: var(--line) solid var(--dy-black);
+}
+.card-tel:hover { filter: none; background: #1a1a1a; }
+
+.slide-end {
+  background: var(--dy-white);
+  border: var(--line) solid var(--dy-black);
+  border-radius: var(--r-card);
+  color: var(--dy-black);
+}
+.slide-end:hover { background: var(--dy-black); color: var(--dy-yellow); }
+
+/* ==========================================================================
+   しぼりこみ ─ 選択＝黄ベタ／非選択＝白地に「黄色い枠」
+   ★枠が黒ではなく黄色。ここが do-ya? のタグの見分けどころ
+   ========================================================================== */
+.chip {
+  background: var(--dy-white);
+  border: var(--line) solid var(--dy-yellow);
+  color: var(--dy-black); border-radius: 999px; font-weight: 700;
+}
+.chip:hover { border-color: var(--dy-yellow); color: var(--dy-black); background: rgba(255,196,28,.22); }
+.chip.on { background: var(--dy-yellow); border-color: var(--dy-yellow); color: var(--dy-black); }
+.chip-n { opacity: .7; }
+.toggle input:checked + .toggle-box { background: var(--dy-black); }
+
+/* ==========================================================================
+   ボタン ─ 白地・黒2px枠・ピル。中身は【英語（太）＋日本語（小）】
+   ========================================================================== */
+.btn {
+  background: var(--dy-white); color: var(--dy-black);
+  border: var(--line) solid var(--dy-black); border-radius: 999px;
+  font-weight: 700;
+}
+.btn:hover { filter: none; background: var(--dy-black); color: var(--dy-yellow); }
+.btn-en {
+  font-family: var(--font-en); font-weight: 700;
+  font-size: 1.05em; margin-right: .7em; letter-spacing: .03em;
+}
+
+.ask { background: var(--dy-white); border: var(--line) solid var(--dy-black); border-radius: var(--r-card); }
+.ask p { color: var(--ink-mid); }
+.soon-box { background: var(--dy-white); border: var(--line) solid var(--dy-black); border-radius: var(--r-card); }
+.soon-num { color: var(--dy-black); }
+
+/* ==========================================================================
+   ★ステッカー ─ 小さな黄色い吹き出し。余白にぽんと置く
+   ========================================================================== */
+.sticker {
+  position: relative; display: inline-block;
+  background: var(--dy-yellow); color: var(--dy-black);
+  font-family: var(--font-display); font-weight: 700; font-size: .74rem; line-height: 1;
+  padding: 9px 15px; border-radius: 999px;
+  transform: rotate(-3deg);
+}
+.sticker::after {
+  content: ""; position: absolute; left: 18px; bottom: -8px;
+  border: 9px solid transparent; border-bottom: 0; border-top-color: var(--dy-yellow);
+}
+
+/* ==========================================================================
+   フッタ ─ 黒／上角丸／メニューは【英語＋日本語】の二段で中央寄せ
+   ========================================================================== */
+.ft {
+  background: var(--dy-black); color: var(--dy-white);
+  border-radius: var(--r-band) var(--r-band) 0 0;
+  text-align: center;
+}
+.ft-logo { color: var(--dy-white); }
+.ft-sub { color: var(--dy-white); opacity: .5; }
+.ft-nav {
+  max-width: none; margin-top: var(--s-10);
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: var(--s-6) var(--s-4);
+}
+.ft-nav a {
+  flex-direction: column; align-items: center; gap: 3px;
+  padding: 0; border-bottom: 0;
+}
+.ft-nav em {
+  font-family: var(--font-en); font-weight: 700;
+  font-size: .92rem; letter-spacing: .05em;
+  opacity: 1; color: var(--dy-white); min-width: 0;
+}
+.ft-nav a span { font-size: .68rem; color: rgba(255,255,255,.6); }
+.ft-note { opacity: .45; }
+
+/* ==========================================================================
+   ★右下の固定バッジ（do-ya? のトゲトゲの「？」）＝上にもどる
+   ========================================================================== */
+.pagetop {
+  position: fixed; right: 14px; bottom: 14px; z-index: 50;
+  width: 62px; height: 62px;
+  background: var(--dy-black); color: var(--dy-yellow);
+  font-family: var(--font-en); font-weight: 700; font-size: 1.5rem; line-height: 1;
+  display: grid; place-items: center;
+  clip-path: polygon(50.0% 0.0%,58.7% 12.0%,71.7% 5.0%,74.3% 19.5%,89.1% 18.8%,85.1% 33.1%,98.7% 38.9%,89.0% 50.0%,98.7% 61.1%,85.1% 66.9%,89.1% 81.2%,74.3% 80.5%,71.7% 95.0%,58.7% 88.0%,50.0% 100.0%,41.3% 88.0%,28.3% 95.0%,25.7% 80.5%,10.9% 81.2%,14.9% 66.9%,1.3% 61.1%,11.0% 50.0%,1.3% 38.9%,14.9% 33.1%,10.9% 18.8%,25.7% 19.5%,28.3% 5.0%,41.3% 12.0%);
+  opacity: 0; visibility: hidden;
+  transition: opacity .3s var(--ease), visibility .3s, transform .3s var(--ease);
+}
+.pagetop.on { opacity: 1; visibility: visible; }
+.pagetop:hover { transform: rotate(12deg); }
+@media (prefers-reduced-motion: reduce) { .pagetop { transition: none; } }
+
+/* ==========================================================================
+   帯の中の吹き出し（drink.html の黒帯など）
+   ========================================================================== */
+.bubble { background: var(--dy-black); color: var(--dy-yellow); }
+.bubble::after { border-top-color: var(--dy-black); }
+.ticker { background: var(--dy-black); color: var(--dy-yellow); }
+
+/* ==========================================================================
+   ヒーロー ─ 濃紺のベタ塗りをやめ、背景イラストを透かす白地に
+   （do-ya? のトップと同じ考え方：地は白、色は帯とパーツで作る）
+   ========================================================================== */
+.hero { background: transparent; color: var(--dy-black); padding-top: var(--s-10); }
+.hero::before { display: none; }
+.hero-en {
+  display: inline-block;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: .82rem; letter-spacing: 0;
+  background: var(--dy-yellow); color: var(--dy-black);
+  padding: 10px 18px; border-radius: 999px;
+}
+.hero-h { color: var(--dy-black); font-weight: 900; line-height: 1.38; }
+.hero-lead { color: var(--ink-mid); opacity: 1; }
+.hero-num { font-family: var(--font-en); font-weight: 700; color: var(--dy-black); }
+.hero-unit { color: var(--dy-black); }
+.hero-of { color: var(--ink-mid); opacity: 1; }
+.hero-caveat { color: var(--ink-faint); opacity: 1; }
+
+/* ==========================================================================
+   店舗ページ ─ do-ya? の黒／黄／白に揃える
+   ========================================================================== */
+.crumb a { color: var(--dy-black); font-weight: 700; }
+.also-link { border: var(--line) solid var(--dy-yellow); color: var(--dy-black); }
+
+/* ★料金は「夜の店でいちばん知りたい情報」。黒地×黄文字で最も強く出す */
+.charge { background: var(--dy-black); color: var(--dy-white); border-radius: var(--r-card); }
+.charge-label { color: var(--dy-yellow); }
+.charge-val { color: var(--dy-yellow); }
+.charge-note { opacity: .5; }
+
+.sig { background: var(--dy-ice); border-left-color: var(--dy-black); border-radius: var(--r-card); }
+.sig-label { color: var(--dy-black); }
+.sig-price { color: var(--dy-black); }
+
+.facts { border-radius: var(--r-card); overflow: hidden; border: var(--line) solid var(--dy-black); background: var(--dy-black); }
+.fact-val.ok { color: var(--dy-black); background: var(--dy-yellow); display: inline-block; padding: 3px 10px; border-radius: 999px; }
+.fact-val.ng { color: var(--ink-faint); }
+
+.act { border: var(--line) solid var(--dy-black); border-radius: 999px; }
+.act:hover { border-color: var(--dy-black); background: var(--dy-yellow); transform: translateY(-2px); }
+.act-primary { background: var(--dy-black); border-color: var(--dy-black); color: var(--dy-yellow); }
+.act-primary:hover { background: #1a1a1a; color: var(--dy-yellow); filter: none; }
+
+.nb-card { border: var(--line) solid var(--dy-black); border-radius: var(--r-card); }
+.nb-card:hover { border-color: var(--dy-black); background: var(--dy-yellow); }
+.nb-charge { color: var(--dy-black); }
+.fix a { color: var(--dy-black); }
+
+.soon-box { background: var(--dy-white); }
+.plans li::before { background: var(--dy-yellow); border: 2px solid var(--dy-black); width: 10px; height: 10px; }
+.warn-mark { background: var(--dy-black); color: var(--dy-yellow); }
+
+/* 黒帯の中の「同じ建物」カード。アクセント色は黒地で沈むので黄に */
+.sec.dark .bld, .sec.mid .bld { border-color: rgba(255,255,255,.28); }
+.bld-name { color: var(--dy-yellow); }
+.bld-list a:hover b { color: var(--dy-yellow); }
+
+/* ==========================================================================
+   ★ホーム ─ do-ya? に合わせて、海の濃紺をやめ白地に
+   --------------------------------------------------------------------------
+   浮きは残すが、do-ya? の「Category」の丸アイコン（白地＋黒枠の正円）の
+   作りに寄せる。色は黄・黒・白・氷の4色だけで組む。
+   ※ 物理演算のパラメータは触っていない（別途調整の予定）
+   ========================================================================== */
+.sea {
+  background: transparent;
+  min-height: calc(100svh - 64px);
+}
+.waves { display: none; }
+
+.masthead { text-align: left; padding: var(--s-8) var(--s-6) 0; }
+.home-pill {
+  display: inline-block;
+  background: var(--dy-yellow); color: var(--dy-black);
+  font-family: var(--font-display); font-weight: 700;
+  font-size: .82rem; line-height: 1;
+  padding: 10px 18px; border-radius: 999px;
+}
+.home-en {
+  margin-top: 12px;
+  font-family: var(--font-en); font-weight: 700;
+  font-size: clamp(2.6rem, 13vw, 4.4rem); line-height: .92;
+  letter-spacing: .01em; color: var(--dy-black);
+}
+.home-sub {
+  margin-top: 8px;
+  font-size: var(--t-xs); font-weight: 700;
+  letter-spacing: .06em; color: var(--ink-mid);
+}
+
+/* --- 浮き＝do-ya? の丸アイコン。白地＋黒3px枠 ------------------------- */
+.buoy {
+  background: var(--dy-white);
+  border: 3px solid var(--dy-black);
+  box-shadow: none;
+  color: var(--dy-black);
+}
+.buoy::after { display: none; }          /* 浮きの帯線は使わない */
+.buoy-label { color: inherit; text-shadow: none; }
+.buoy-note  { color: inherit; text-shadow: none; opacity: .62; }
+.buoy-soon  { background: var(--dy-black); color: var(--dy-yellow); }
+.buoy.soon  { opacity: 1; background: var(--dy-ice); }
+
+/* do-ya? も丸アイコンの一部だけ塗り分けている。全部同じ白にしない */
+.buoy:nth-child(2) { background: var(--dy-yellow); }
+.buoy:nth-child(5) { background: var(--dy-black); color: var(--dy-white); }
+.buoy:nth-child(5) .buoy-soon { background: var(--dy-yellow); color: var(--dy-black); }
+.buoy:hover, .buoy:focus-visible {
+  filter: none; background: var(--dy-yellow); color: var(--dy-black);
+}
+
+.seabed { color: var(--dy-black); padding-bottom: var(--s-10); }
+.hint { opacity: 1; font-weight: 700; }
+.hint-mark { opacity: .5; }
+.credit { opacity: .45; }
+
+/* 選んだ色で画面が満ちる演出。踏襲版では黄で統一する
+   （カテゴリ色に戻したいときは、この1行を消すだけ） */
+.flood { background: var(--dy-yellow) !important; }
+
+/* --- 固定バッジの修正 ------------------------------------------------------
+   do-ya? は「黒いトゲトゲ＋黄の？」だが、うちは黒いフッタの上を通るので
+   黒だと消える。色を反転して「黄のトゲトゲ＋黒の矢印」にする。
+   形と palette は do-ya? のまま。 */
+.pagetop { background: var(--dy-yellow); color: var(--dy-black); font-size: 1.6rem; }
+
+/* --- ヘッダーのひとこと（do-ya? のロゴ横の2行）--------------------------- */
+.hd-tag {
+  font-size: .62rem; font-weight: 700; line-height: 1.5;
+  color: var(--ink-mid); margin-left: 10px;
+}
+@media (max-width: 400px) { .hd-tag { display: none; } }
+
+/* --- 浮きの中の文字を少し整える ------------------------------------------ */
+.buoy { width: clamp(126px, 30vw, 168px); }
+.buoy-note { font-size: .62rem; line-height: 1.45; }

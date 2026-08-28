@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>お店を教える ─ bo-rro !［枕崎市網羅型ポータルサイト］</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="hd"></div>
+<section class="hero">
+  <div class="wrap">
+    <p class="hero-en">SHOP</p>
+    <h1 class="hero-h">お店を教えてください</h1>
+    <p class="hero-lead">いま <span class="num" id="n">-</span> 軒を載せる準備をしています。<br>
+      でも枕崎のお店は、まだこんなものではないはずです。</p>
+  </div>
+</section>
+
+<main class="sec">
+  <div class="wrap" style="max-width:44rem">
+    <div class="soon-box">
+      <p class="sec-en" style="font-size:var(--t-md)">FREE</p>
+      <p class="sec-ja">掲載は無料です</p>
+      <ul class="plans">
+        <li>お金はいただきません</li>
+        <li>いつでも消せます。ひとことで結構です</li>
+        <li><strong>住所を伏せて載せる</strong>こともできます</li>
+        <li>載せてほしくない場合も、そう伝えてください</li>
+      </ul>
+    </div>
+
+    <div class="soon-box" style="margin-top:var(--s-6)">
+      <p class="sec-en" style="font-size:var(--t-md)">INFO</p>
+      <p class="sec-ja">教えてほしいこと</p>
+      <ul class="plans">
+        <li>お店の名前と場所</li>
+        <li>営業時間と、休みの日</li>
+        <li>電話番号、InstagramやX</li>
+        <li>予約の方法（電話だけ、DMも可、など）</li>
+        <li>お金の目安があれば</li>
+      </ul>
+      <p style="margin-top:var(--s-3);font-size:var(--t-xs);color:var(--ink-mid)">
+        全部そろっていなくて大丈夫です。名前だけでも。</p>
+    </div>
+
+    <div class="ask" style="margin-top:var(--s-8)">
+      <h2>フォームは準備中です</h2>
+      <p>いまは Instagram <strong>@borro_makurazaki</strong> のDMで受け付けています。</p>
+    </div>
+  </div>
+</main>
+<div id="ft"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+document.getElementById("n").textContent = SHOPS.length;
+mountHeader(null); mountFooter();
+</script>
+</body>
+</html>

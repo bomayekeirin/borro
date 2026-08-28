@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ページが見つかりません ─ bo-rro !［枕崎市網羅型ポータルサイト］</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="hd"></div>
+<section class="hero">
+  <div class="wrap" style="text-align:center">
+    <p class="hero-en">404</p>
+    <h1 class="hero-h">そのページは、<br>ありませんでした</h1>
+    <p class="hero-lead" style="margin-inline:auto">消えたか、まだ作っていないかのどちらかです。</p>
+  </div>
+</section>
+<main class="sec">
+  <div class="wrap" id="grid" style="display:grid;gap:var(--s-3);
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr))"></div>
+</main>
+<div id="ft"></div>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+mountHeader(null); mountFooter();
+document.getElementById("grid").innerHTML = CATEGORIES.map(c => `
+  <a href="${c.id}.html" style="--c:${c.color};display:flex;align-items:center;gap:var(--s-3);
+     padding:var(--s-5);border-radius:var(--r-md);border:1.5px solid var(--c);background:#fff">
+    <span><b style="font-family:var(--font-display);font-size:var(--t-md);color:var(--c)">${c.label}</b><br>
+    <small style="font-size:var(--t-xs);color:var(--ink-mid)">${c.note}</small></span>
+    <span style="margin-left:auto;color:var(--c)">→</span></a>`).join("");
+</script>
+</body>
+</html>

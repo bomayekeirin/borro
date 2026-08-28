@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><!-- ★公開時に削除する -->
+<title>飲む ─ bo-rro !［枕崎市網羅型ポータルサイト］</title>
+<meta name="description" content="枕崎市の居酒屋・バー・スナック・カラオケ。料金がわかる夜の店の一覧。">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body data-cat="drink">
+<div id="hd"></div>
+
+<!-- ==========================================================================
+     ★このページだけの導入部。文章を変えたいときはここを直接書き換える
+     ========================================================================== -->
+<div id="hero" data-custom="1">
+<section class="hero">
+  <div class="wrap">
+    <p class="hero-en">DRINK</p>
+    <h1 class="hero-h">いくらかかるか、<br>先に書いておきます。</h1>
+    <p class="hero-lead">
+      入る前にいちばん気になるのは、たぶん値段だと思います。<br>
+      わかっている分だけ、そのまま載せました。
+    </p>
+    <div class="hero-stat">
+      <span class="hero-num" id="open-n">-</span>
+      <span class="hero-unit">軒が今日の営業日</span>
+      <span class="hero-of">／ 掲載 <span id="all-n">-</span> 軒</span>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ★流れる黒帯。黒×黄で最も目を引く。面積は絞る -->
+<div class="ticker">
+  <div class="ticker-in">
+    <span>枕崎の夜は、思ったより長い</span><span>◆</span>
+    <span>深夜1時をすぎても開いてる店がある</span><span>◆</span>
+    <span>折口町92には、2軒入ってる</span><span>◆</span>
+    <span>枕崎の夜は、思ったより長い</span><span>◆</span>
+    <span>深夜1時をすぎても開いてる店がある</span><span>◆</span>
+    <span>折口町92には、2軒入ってる</span><span>◆</span>
+  </div>
+</div>
+
+<!-- ★料金の横並び。この一覧はネット上のどこにも存在しない -->
+<section class="sec sun">
+  <div class="wrap sec-hd">
+    <h2 class="sec-en">PRICE</h2>
+    <p class="sec-ja">わかっているぶんの料金</p>
+    <p class="bubble" style="margin-left:auto">ここにしか載っていません</p>
+  </div>
+  <div class="wrap"><ul class="price" id="price"></ul>
+    <p style="margin-top:var(--s-4);font-size:var(--t-xs);opacity:.6">
+      ※ 掲載時点の情報です。変わることがあるので、お店で確認してください。</p>
+  </div>
+</section>
+
+<!-- ★同じ建物に2軒以上＝はしご酒 -->
+<section class="sec mid" id="hashigo-sec" hidden>
+  <div class="wrap sec-hd">
+    <h2 class="sec-en">HASHIGO</h2>
+    <p class="sec-ja">歩かなくていい夜</p>
+  </div>
+  <div class="wrap"><p class="slide-hint">よこにスクロール</p></div>
+  <div class="slide" id="hashigo"></div>
+</section>
+
+<main id="app"></main>
+<div id="ft"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+const drinks = shopsIn("drink");
+document.getElementById("open-n").textContent = drinks.filter(isOpenToday).length;
+document.getElementById("all-n").textContent = drinks.length;
+
+/* 料金 */
+document.getElementById("price").innerHTML = drinks.filter(s => s.charge).map(s => `
+  <li class="price-row">
+    <a class="price-name" href="shop.html?s=${s.slug}">${esc(s.name)}</a>
+    <span class="price-val">${esc(s.charge)}</span>
+    <span class="price-where">${esc(s.address)}</span>
+  </li>`).join("");
+
+/* はしご酒 */
+const blds = new Map();
+drinks.forEach(s => {
+  if (!s.building) return;
+  if (!blds.has(s.building)) blds.set(s.building, []);
+  blds.get(s.building).push(s);
+});
+const hashigo = [...blds.entries()].filter(([, v]) => v.length >= 2);
+if (hashigo.length) {
+  document.getElementById("hashigo-sec").hidden = false;
+  document.getElementById("hashigo").innerHTML = hashigo.map(([name, list]) => `
+    <div class="bld">
+      <p class="bld-name">${esc(name)}</p>
+      <ul class="bld-list">
+        ${list.map(s => `<li><a href="shop.html?s=${s.slug}">
+          <b>${esc(s.name)}</b><small>${esc(s.subLabel)}</small></a></li>`).join("")}
+      </ul>
+    </div>`).join("");
+}
+
+buildCategory("drink");
+</script>
+</body>
+</html>

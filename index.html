@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body class="home">
@@ -41,8 +41,8 @@
 </main>
 <div id="ft"></div>
 
-<script src="assets/data.js"></script>
-<script src="assets/app.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 <script>
 /* ==========================================================================
@@ -69,24 +69,56 @@ nav.innerHTML = CATEGORIES.map(c => `
 const buoys = [...nav.querySelectorAll(".buoy")];
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* 選んだ色で画面が満ちてから移動する */
+/* 選んだ色で画面が満ちてから移動する
+   --------------------------------------------------------------------------
+   ★2026/8/28 修正
+   以前は click を待っていたが、スマホでは反応しないことがあった。理由は2つ。
+     ① Matter.js が touchmove を preventDefault するため、click が出ないことがある
+     ② 浮きは常に揺れているので、指を置いた瞬間に物体が動き、
+        「掴んで投げた」と誤判定されてタップが握りつぶされていた
+   → **物体ではなく指の動きを見る**ように変えた。
+      指がほとんど動かず、短時間で離れたら「タップ」とみなす。 */
+function goTo(el) {
+  if (el.dataset.going === "1") return;
+  el.dataset.going = "1";
+  const r = el.getBoundingClientRect();
+  flood.style.setProperty("--flood", getComputedStyle(el).getPropertyValue("--c").trim());
+  flood.style.setProperty("--fx", `${r.left + r.width / 2}px`);
+  flood.style.setProperty("--fy", `${r.top + r.height / 2}px`);
+  flood.classList.add("on");
+  setTimeout(() => { location.href = el.getAttribute("href"); }, reduced ? 60 : 520);
+}
+
+let press = null;
+nav.addEventListener("pointerdown", e => {
+  press = { x: e.clientX, y: e.clientY, t: Date.now() };
+}, true);
+
+nav.addEventListener("pointerup", e => {
+  if (!press) return;
+  const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y);
+  const quick = Date.now() - press.t < 700;
+  press = null;
+  if (moved > 12 || !quick) return;          // 投げた・長押しした → 遷移しない
+  const el = e.target.closest(".buoy");
+  if (el) goTo(el);
+}, true);
+
+nav.addEventListener("pointercancel", () => { press = null; }, true);
+
+/* リンクの既定動作は常に止める。遷移は goTo が受け持つ。
+   ただしキーボード操作（e.detail === 0）だけは、ここから遷移させる */
 buoys.forEach(el => {
   el.addEventListener("click", e => {
-    if (el.dataset.dragged === "1") { e.preventDefault(); el.dataset.dragged = "0"; return; }
     e.preventDefault();
-    const r = el.getBoundingClientRect();
-    flood.style.setProperty("--flood", getComputedStyle(el).getPropertyValue("--c").trim());
-    flood.style.setProperty("--fx", `${r.left + r.width / 2}px`);
-    flood.style.setProperty("--fy", `${r.top + r.height / 2}px`);
-    flood.classList.add("on");
-    setTimeout(() => { location.href = el.getAttribute("href"); }, reduced ? 60 : 520);
-  }, true);
+    if (e.detail === 0) goTo(el);            // Enter / Space で選んだとき
+  });
 });
 
 if (!reduced && window.Matter) startPhysics();
 
 function startPhysics() {
-  const { Engine, Runner, Bodies, Composite, Mouse, MouseConstraint, Body, Events } = Matter;
+  const { Engine, Runner, Bodies, Composite, Mouse, MouseConstraint, Body } = Matter;
   let W = nav.clientWidth, H = nav.clientHeight;
   if (W < 80 || H < 80) return;
 
@@ -130,16 +162,8 @@ function startPhysics() {
   Composite.add(engine.world, mc);
   if (mouse.mousewheel) mouse.element.removeEventListener("wheel", mouse.mousewheel);
 
-  /* 掴んで動かしたときはクリック扱いにしない */
-  let ds = null;
-  Events.on(mc, "startdrag", e => { ds = { ...e.body.position }; });
-  Events.on(mc, "enddrag", e => {
-    if (e.body.__el && ds) {
-      const d = Math.hypot(e.body.position.x - ds.x, e.body.position.y - ds.y);
-      if (d > 8) e.body.__el.dataset.dragged = "1";
-    }
-    ds = null;
-  });
+  /* ★掴んだ判定は index 側の pointerdown / pointerup に移した（2026/8/28）
+     物体の移動量で判定すると、揺れているだけでタップが握りつぶされる */
 
   Runner.run(Runner.create(), engine);
 

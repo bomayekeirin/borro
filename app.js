@@ -668,6 +668,7 @@ document.addEventListener("click", e => {
    ★D-12（Instagram宣伝枠）の見え方をここで決める。
 
    埋め込めるのは **投稿1件（/p/コード/ または /reel/コード/）だけ**。
+   リールは post に "reel/コード" と書く。通常の投稿はコードだけでよい。
    プロフィールページには公式の埋め込み用URLが無いので埋め込めない。
      → 投稿コードが無いアカウントは、プロフィールへ飛ぶカードとして出す。
 
@@ -683,7 +684,10 @@ function buildInstaRail(hostId, opts) {
   if (!host || !opts || !opts.accounts || !opts.accounts.length) return;
 
   const cards = opts.accounts.map(a => {
+    /* post は "DccGBDdTAIT"（通常の投稿）でも
+       "reel/DcnX2Uux5VO"（リール）でも受け取れるようにする */
     const code = a.post || "";
+    const path = code ? (code.indexOf("/") >= 0 ? code : "p/" + code) : "";
     const prof = `https://www.instagram.com/${a.handle}/`;
     return `
 <article class="ig-card">
@@ -697,7 +701,7 @@ function buildInstaRail(hostId, opts) {
   </a>
   <div class="ig-body">
     ${code
-      ? `<div class="ig-slot" data-src="https://www.instagram.com/p/${code}/embed/">
+      ? `<div class="ig-slot" data-src="https://www.instagram.com/${path}/embed/">
            <span class="ig-wait">読み込んでいます…</span>
          </div>`
       : `<a class="ig-empty" href="${prof}" target="_blank" rel="noopener">

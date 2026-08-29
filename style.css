@@ -2062,3 +2062,13 @@ body > .pop.on { display: block; }
   margin-top: var(--s-4);
   font-size: var(--t-xs); line-height: 1.75; color: var(--ink-faint);
 }
+
+/* 横スライドの1枚目が画面の端にくっついていたので、少し離す。
+   右端は「まだ続く」感を出すため、これまでどおり流したままにする。
+
+   ★scroll-padding も一緒に指定すること。
+     指定しないと scroll-snap が余白を無視して、1枚目が端まで寄ってしまう。 */
+.slide {
+  padding-left:        max(var(--s-5), calc((100vw - var(--wrap)) / 2 + var(--s-4)));
+  scroll-padding-left: max(var(--s-5), calc((100vw - var(--wrap)) / 2 + var(--s-4)));
+}

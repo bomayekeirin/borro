@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20260829d">
+<link rel="stylesheet" href="style.css?v=20260829g">
 </head>
 
 <!-- ★quiet＝静かな構え。行政の情報を扱う面なので、黄色は行動を促す一点だけに絞る -->
@@ -172,39 +172,10 @@
   <div id="app"></div>
 </main>
 
-<!-- 制度のページを、サイトを離れずに読むためのポップアップ -->
-<div class="pop" id="pop" hidden aria-hidden="true">
-  <div class="pop-back" id="popBack"></div>
-  <div class="pop-panel" role="dialog" aria-modal="true" aria-labelledby="popTitle">
-    <div class="pop-bar">
-      <div class="pop-head">
-        <p class="pop-title" id="popTitle"></p>
-        <p class="pop-src">枕崎市公式サイト<span>city.makurazaki.lg.jp</span></p>
-      </div>
-      <button class="pop-x" id="popX" type="button" aria-label="閉じる">
-        <span aria-hidden="true">✕</span><span class="pop-x-t">とじる</span>
-      </button>
-    </div>
-
-    <div class="pop-body">
-      <div class="pop-load" id="popLoad">読み込んでいます…</div>
-      <iframe class="pop-frame" id="popFrame" title="制度の説明"
-              referrerpolicy="no-referrer" loading="lazy"></iframe>
-    </div>
-
-    <div class="pop-foot">
-      <p class="pop-hint">白いまま表示されないときは、こちらから開いてください</p>
-      <a class="pop-open" id="popOpen" href="#" target="_blank" rel="noopener">
-        <span class="btn-en">Open</span>市の公式ページを開く ↗
-      </a>
-    </div>
-  </div>
-</div>
-
 <div id="ft"></div>
 
-<script src="data.js?v=20260829d"></script>
-<script src="app.js?v=20260829d"></script>
-<script src="life.js?v=20260829d"></script>
+<script src="data.js?v=20260829g"></script>
+<script src="app.js?v=20260829g"></script>
+<script src="life.js?v=20260829g"></script>
 </body>
 </html>

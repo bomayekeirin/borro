@@ -10,22 +10,42 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20260829d">
+<link rel="stylesheet" href="style.css?v=20260829f">
 </head>
 
 <body data-cat="eat">
 <div id="hd"></div>
 <div id="hero"></div>
+<div id="igrail"></div>
 <main id="app"></main>
 <div id="ft"></div>
 
-<script src="data.js?v=20260829d"></script>
-<script src="app.js?v=20260829d"></script>
+<script src="data.js?v=20260829f"></script>
+<script src="app.js?v=20260829f"></script>
 <script>
 /* ★このページの「顔」。文章を変えたいときはここ */
 buildCategory("eat", {
   headline: "かつおの町の、\u3000ふつうの食卓",
   lead: "かつお節の生産量が日本一なので、かつおの店は多い。ただ地元の人が毎日通うのは、食堂とパン屋とカフェだったりする。両方まとめて載せました。",
+});
+
+/* ★Instagram の横スライド（UI検証中）
+   --------------------------------------------------------------------------
+   post に **投稿のコード** を入れると、その投稿が埋め込まれる。
+   投稿を開いて「共有 → リンクをコピー」で取れる、
+   https://www.instagram.com/p/【ここ】/ の部分。
+
+   post が空のうちは、プロフィールへ飛ぶカードとして出る。
+   ※プロフィールページ自体は、Instagram が埋め込みを許可していないため埋め込めない。 */
+buildInstaRail("igrail", {
+  ja: "お店からの、いちばん新しい話",
+  en: "Instagram",
+  accounts: [
+    { name: "のどか",           handle: "o.p.87_nodoka",        post: "" },
+    { name: "ツキミチ喫茶",     handle: "tsukimichi31",         post: "" },
+    { name: "ベンガラ和・かず", handle: "ben__kazu",            post: "" },
+    { name: "土踏まず",         handle: "tuchifumazu_official", post: "" },
+  ],
 });
 </script>
 </body>

@@ -537,3 +537,213 @@ function buildShop() {
   </div>
 </section>`;
 }
+
+/* ==========================================================================
+   11. ポップアップ（サイトを離れずに、外部の中身を読む）
+   --------------------------------------------------------------------------
+   ★使いどころの原則（2026/8/29に実機で確かめた結論）
+
+     「公式に埋め込み用のURLを配っているものだけ」を入れる。
+     それ以外は賭けになる。しかも**成否は事前にも事後にも判定できない。**
+     X-Frame-Options で拒否されたとき、ブラウザは成功と同じ load を出し、
+     中身も別ドメイン扱いになるため、JavaScript から区別がつかない。
+
+   | 対象                        | 可否 | 備考                                   |
+   |-----------------------------|------|----------------------------------------|
+   | Instagram の投稿1件         | ○    | instagram.com/p/{code}/embed/          |
+   | X（旧Twitter）の投稿1件     | ○    | 公式の埋め込みあり                     |
+   | YouTube                     | ○    | 公式の埋め込みあり                     |
+   | Google マップ               | ○    | 公式の埋め込みあり                     |
+   | **枕崎市の公式サイト**      | **×**| **拒否される。2026/8/29 実機で確認済み** |
+   | Instagram のプロフィール    | ×    | 埋め込み用URLが存在しない              |
+   | 食べログ・EPARK 等          | ほぼ×| 大半が拒否                             |
+   | お店の自前サイト            | 賭け | そもそも shop.html があるので不要      |
+
+   ★行政関連は、すべて別タブで開くこと。ポップアップに入れない。
+
+   使い方
+     openPop({ url, title, source })
+     または <a href="..." data-pop data-source="..."> にしておくと自動で開く
+   ========================================================================== */
+function openPop(opt) {
+  const url    = opt.url;
+  const title  = opt.title  || "";
+  const source = opt.source || (() => { try { return new URL(url).hostname; } catch (e) { return ""; } })();
+
+  let pop = document.getElementById("pop");
+  if (!pop) {
+    pop = document.createElement("div");
+    pop.className = "pop";
+    pop.id = "pop";
+    pop.innerHTML = `
+<div class="pop-back" data-close></div>
+<div class="pop-panel" role="dialog" aria-modal="true" aria-labelledby="popTitle">
+  <div class="pop-bar">
+    <div class="pop-head">
+      <p class="pop-title" id="popTitle"></p>
+      <p class="pop-src"><b></b><span></span></p>
+    </div>
+    <button class="pop-x" type="button" data-close aria-label="閉じる">
+      <span aria-hidden="true">✕</span><span class="pop-x-t">とじる</span>
+    </button>
+  </div>
+  <div class="pop-body">
+    <div class="pop-load">読み込んでいます…</div>
+    <iframe class="pop-frame" title="外部の内容" referrerpolicy="no-referrer"
+            allow="encrypted-media; picture-in-picture" loading="lazy"></iframe>
+  </div>
+  <div class="pop-foot">
+    <p class="pop-hint">白いまま表示されないときは、こちらから開いてください</p>
+    <a class="pop-open" target="_blank" rel="noopener">
+      <span class="btn-en">Open</span>もとのページを開く ↗
+    </a>
+  </div>
+</div>`;
+    document.body.appendChild(pop);
+
+    pop.addEventListener("click", e => { if (e.target.closest("[data-close]")) closePop(); });
+    addEventListener("keydown", e => { if (e.key === "Escape") closePop(); });
+  }
+
+  const frame = pop.querySelector(".pop-frame");
+  const load  = pop.querySelector(".pop-load");
+
+  pop.querySelector(".pop-title").textContent   = title;
+  pop.querySelector(".pop-src b").textContent   = opt.label || "外部サイト";
+  pop.querySelector(".pop-src span").textContent = source;
+  pop.querySelector(".pop-open").href           = opt.href || url;
+
+  load.hidden = false;
+  frame.style.visibility = "hidden";
+  frame.src = url;
+
+  const reveal = () => { load.hidden = true; frame.style.visibility = "visible"; };
+  clearTimeout(openPop._t);
+  openPop._t = setTimeout(reveal, 2500);
+  frame.onload = () => setTimeout(reveal, 200);
+
+  openPop._back = document.activeElement;
+  pop.classList.add("on");
+  document.body.classList.add("pop-lock");
+  pop.querySelector(".pop-x").focus();
+}
+
+function closePop() {
+  const pop = document.getElementById("pop");
+  if (!pop || !pop.classList.contains("on")) return;
+  clearTimeout(openPop._t);
+  pop.classList.remove("on");
+  pop.querySelector(".pop-frame").src = "about:blank";
+  document.body.classList.remove("pop-lock");
+  if (openPop._back) openPop._back.focus();
+}
+
+/* Instagram の投稿を開く。code は URL の /p/XXXX/ の部分 */
+function openInstagram(code, title) {
+  openPop({
+    url: `https://www.instagram.com/p/${code}/embed/`,
+    href: `https://www.instagram.com/p/${code}/`,
+    title: title || "Instagramの投稿",
+    label: "Instagram",
+    source: "instagram.com",
+  });
+}
+
+/* data-pop の付いたリンクは、自動でポップアップで開く */
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[data-pop]");
+  if (!a) return;
+  e.preventDefault();
+  openPop({
+    url: a.dataset.embed || a.getAttribute("href"),
+    href: a.getAttribute("href"),
+    title: a.dataset.name || a.textContent.trim(),
+    label: a.dataset.label,
+  });
+});
+
+/* ==========================================================================
+   12. Instagram の投稿を横スライドで並べる
+   --------------------------------------------------------------------------
+   ★D-12（Instagram宣伝枠）の見え方をここで決める。
+
+   埋め込めるのは **投稿1件（/p/コード/ または /reel/コード/）だけ**。
+   プロフィールページには公式の埋め込み用URLが無いので埋め込めない。
+     → 投稿コードが無いアカウントは、プロフィールへ飛ぶカードとして出す。
+
+   ★重さ対策：画面に入るまで iframe を読み込まない。
+     Instagram の埋め込みは Meta のスクリプトを読むため、
+     4枚まとめて読むとページが目に見えて重くなる。
+
+   ★プライバシー：埋め込みを本番で使う前に privacy.html が要る。
+     訪問者の情報が Meta に渡るため、明記が必要。
+   ========================================================================== */
+function buildInstaRail(hostId, opts) {
+  const host = document.getElementById(hostId);
+  if (!host || !opts || !opts.accounts || !opts.accounts.length) return;
+
+  const cards = opts.accounts.map(a => {
+    const code = a.post || "";
+    const prof = `https://www.instagram.com/${a.handle}/`;
+    return `
+<article class="ig-card">
+  <a class="ig-head" href="${prof}" target="_blank" rel="noopener">
+    <span class="ig-mark" aria-hidden="true"></span>
+    <span class="ig-who">
+      <b>${esc(a.name)}</b>
+      <small>@${esc(a.handle)}</small>
+    </span>
+    <span class="ig-go" aria-hidden="true">↗</span>
+  </a>
+  <div class="ig-body">
+    ${code
+      ? `<div class="ig-slot" data-src="https://www.instagram.com/p/${code}/embed/">
+           <span class="ig-wait">読み込んでいます…</span>
+         </div>`
+      : `<a class="ig-empty" href="${prof}" target="_blank" rel="noopener">
+           <b>投稿はInstagramで</b>
+           <span>@${esc(a.handle)} を開く</span>
+         </a>`}
+  </div>
+</article>`;
+  }).join("");
+
+  host.innerHTML = `
+<section class="sec ig-sec">
+  <div class="wrap">
+    <div class="sec-hd">
+      <p class="sec-ja">${esc(opts.ja || "お店からの、いちばん新しい話")}</p>
+      <h2 class="sec-en">${esc(opts.en || "Instagram")}</h2>
+    </div>
+    <p class="slide-hint">よこにスクロール　→</p>
+  </div>
+  <div class="slide ig-rail">${cards}</div>
+  <div class="wrap"><p class="ig-note">投稿はお店のInstagramのものです。営業日や臨時休業は、お店の投稿が最新です。</p></div>
+</section>`;
+
+  /* 画面に入ったものだけ読み込む */
+  const slots = host.querySelectorAll(".ig-slot");
+  if (!slots.length) return;
+
+  const load = slot => {
+    if (slot.dataset.on) return;
+    slot.dataset.on = "1";
+    const f = document.createElement("iframe");
+    f.src = slot.dataset.src;
+    f.loading = "lazy";
+    f.title = "Instagramの投稿";
+    f.setAttribute("scrolling", "no");
+    f.setAttribute("referrerpolicy", "no-referrer");
+    f.addEventListener("load", () => slot.classList.add("ready"));
+    slot.appendChild(f);
+  };
+
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es, o) => {
+      es.forEach(e => { if (e.isIntersecting) { load(e.target); o.unobserve(e.target); } });
+    }, { rootMargin: "200px" });
+    slots.forEach(s => io.observe(s));
+  } else {
+    slots.forEach(load);
+  }
+}

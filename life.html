@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow"><!-- ★公開時に削除する -->
 <title>暮らし ─ bo-rro !［枕崎市網羅型ポータルサイト］</title>
-<meta name="description" content="枕崎市の暮らし。病院、買い物、市役所">
+<meta name="description" content="枕崎市の暮らし。市のお金の使いみち、病院、買い物、市役所">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,13 +13,247 @@
 <link rel="stylesheet" href="style.css">
 </head>
 
-<body data-cat="life">
+<!-- ★quiet＝静かな構え。行政の情報を扱う面なので、黄色は一点だけに絞る -->
+<body data-cat="life" class="quiet">
 <div id="hd"></div>
-<main id="app"></main>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <p class="hero-en">LIFE</p>
+      <h1 class="hero-h">暮らしの数字は、<br>公開されています</h1>
+      <p class="hero-lead">
+        枕崎市が1年に使うお金は152億7,000万円。どこから来て、何に使われるのかを、
+        市が公開している予算書のとおり図にしました。数字は足しても引いてもいません。
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== 市のお金 ===================== -->
+  <section class="sec">
+    <div class="wrap">
+
+      <div class="sec-hd">
+        <p class="sec-ja">どこから来て、どこへ行くか</p>
+        <h2 class="sec-en">Budget</h2>
+      </div>
+
+      <p class="fin-year">令和8年度（2026年度）当初予算・一般会計</p>
+
+      <div class="fin-kpi">
+        <div>
+          <dt>1年間の予算</dt>
+          <dd><b>152</b>億<b>7,000</b>万円</dd>
+          <small>前年度から ＋3.0%</small>
+        </div>
+        <div>
+          <dt>市民ひとりあたり</dt>
+          <dd><b>84</b>万<b>2,000</b>円</dd>
+          <small>18,134人で割った額</small>
+        </div>
+      </div>
+
+      <p class="fin-legend"><span>左＝入ってくるお金</span><span>右＝出ていくお金</span></p>
+
+      <div class="fin-read" id="finRead" aria-live="polite">
+        <b>帯にふれると、内訳が出ます</b>
+      </div>
+
+      <div class="fin-chart">
+        <svg id="sankey" viewBox="0 0 360 880" role="img"
+             aria-label="枕崎市の令和8年度当初予算。歳入152億7,000万円の内訳と、歳出152億7,000万円の内訳を帯でつないだ図。"></svg>
+      </div>
+
+      <details class="fin-note">
+        <summary>この図について</summary>
+        <div>
+          <p><b>出典</b><br>
+            枕崎市「令和8年度当初予算の概要」および予算書。金額は千円単位の公表値をそのまま使っています。</p>
+          <p><b>まとめた項目</b><br>
+            歳入は上位7款、歳出は上位8款をそのまま並べ、残りを「その他」にまとめました。
+            省いた項目はありません。合計は歳入・歳出とも152億7,000万円で一致します。</p>
+          <p><b>これは決算ではありません</b><br>
+            当初予算、つまり「1年のはじめに立てた計画」の数字です。
+            実際にいくら使ったかは、年度が終わったあとの決算で確定します。</p>
+          <p><b>特別会計は含みません</b><br>
+            国民健康保険・後期高齢者医療・介護保険などを合わせた全会計は215億3,432万円です。
+            この図は一般会計だけを扱っています。</p>
+          <p class="fin-disc">
+            正確を期していますが、内容を保証するものではありません。
+            正式な数字は枕崎市の公表資料をご確認ください。
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <div id="app"></div>
+</main>
+
 <div id="ft"></div>
 
 <script src="data.js"></script>
 <script src="app.js"></script>
-<script>buildSoon("life");</script>
+<script>
+buildSoonInto("life", "app");
+
+/* ==========================================================================
+   市のお金のサンキー図
+   --------------------------------------------------------------------------
+   ライブラリは使わない。歳入 → 総額 → 歳出 の1段だけなので、
+   積み上げた帯をベジェ曲線でつなぐだけで足りる。
+
+   ★数字は加工していない。市の公表値（千円）をそのまま持っている。
+   ========================================================================== */
+(function () {
+  const TOTAL = 15270000;                     /* 千円 */
+
+  const IN = [
+    ["地方交付税",   4100000, "＋2.5%",  "国から配られるお金。使いみちは市が決められる"],
+    ["市税",         2170333, "＋2.2%",  "市民と事業者が納める税金"],
+    ["国庫支出金",   1868605, "△14.0%",  "国が使いみちを決めて出すお金"],
+    ["ふるさと納税", 1846016, "＋12.2%", "市外の人からの寄附"],
+    ["繰入金",       1757330, "＋22.0%", "市の貯金（基金）から取り崩す分"],
+    ["市債",         1290900, "＋11.3%", "市の借金。あとで返す"],
+    ["県支出金",      981836, "△11.3%",  "県が使いみちを決めて出すお金"],
+    ["その他",       1254980, "",        "地方消費税交付金、使用料、財産収入など14項目"],
+  ];
+
+  const OUT = [
+    ["民生費",       4527961, "＋3.2%",   "福祉、子育て、高齢者、障害のある人"],
+    ["総務費",       3968688, "＋6.6%",   "市役所の運営、ふるさと納税の事務、基金への積立"],
+    ["公債費",       1308886, "＋3.2%",   "借金の返済"],
+    ["土木費",       1303394, "△17.7%",   "道路、河川、公園、住宅"],
+    ["消防費",       1139062, "＋126.6%", "消防、救急、防災。今年度は2倍以上に増えた"],
+    ["教育費",       1119288, "△8.1%",    "学校、給食、社会教育、体育"],
+    ["衛生費",        892351, "△7.0%",    "保健、ごみ処理、環境"],
+    ["農林水産業費",  591846, "△29.0%",   "農業、林業、水産業への支援"],
+    ["その他",        418524, "",         "商工費、議会費、労働費、災害復旧費など6項目"],
+  ];
+
+  const svg  = document.getElementById("sankey");
+  const read = document.getElementById("finRead");
+  const NS   = "http://www.w3.org/2000/svg";
+
+  const TOP = 24, H = 830;                    /* 帯を積む範囲 */
+  const LX = 6,   LW = 9;                     /* 左のノード */
+  const CX = 171, CW = 18;                    /* 中央（総額の柱） */
+  const RX = 345, RW = 9;                     /* 右のノード */
+  const GAP = 5;                              /* ノードどうしのすきま */
+
+  const el = (n, a) => {
+    const e = document.createElementNS(NS, n);
+    for (const k in a) e.setAttribute(k, a[k]);
+    return e;
+  };
+
+  /* 千円 → 「◯億◯万円」 */
+  const oku = v => {
+    const yen = v * 1000;
+    const o = Math.floor(yen / 100000000);
+    const m = Math.round((yen - o * 100000000) / 10000);
+    return o > 0 ? o + "億" + (m > 0 ? m.toLocaleString() + "万" : "") + "円"
+                 : m.toLocaleString() + "万円";
+  };
+
+  /* 端の積み上げ（すきま入り） */
+  const stack = rows => {
+    const usable = H - GAP * (rows.length - 1);
+    let y = TOP; const out = [];
+    rows.forEach(r => {
+      const h = r[1] / TOTAL * usable;
+      out.push({ y0: y, y1: y + h, h });
+      y += h + GAP;
+    });
+    return out;
+  };
+  const li = stack(IN), ri = stack(OUT);
+
+  /* 中央はすきま無しの通し。ここで帯が少し扇形に開く */
+  const run = rows => {
+    let y = TOP; const out = [];
+    rows.forEach(r => { const h = r[1] / TOTAL * H; out.push({ y0: y, y1: y + h }); y += h; });
+    return out;
+  };
+  const ci = run(IN), co = run(OUT);
+
+  /* 帯の形。両端の高さが違うのでベジェでつなぐ */
+  const ribbon = (x1, a, x2, b) => {
+    const m = (x1 + x2) / 2;
+    return "M" + x1 + "," + a.y0 + " C" + m + "," + a.y0 + " " + m + "," + b.y0 + " " + x2 + "," + b.y0 +
+           " L" + x2 + "," + b.y1 + " C" + m + "," + b.y1 + " " + m + "," + a.y1 + " " + x1 + "," + a.y1 + " Z";
+  };
+
+  const frag = document.createDocumentFragment();
+
+  /* 中央の柱。★このページで黄色を使うのはここだけ */
+  frag.appendChild(el("rect", {
+    x: CX, y: TOP, width: CW, height: H,
+    fill: "#FFC41C", stroke: "#000", "stroke-width": 2, rx: 3
+  }));
+
+  const build = (rows, side) => {
+    rows.forEach((r, i) => {
+      const name = r[0], val = r[1], diff = r[2], desc = r[3];
+      const near = side === "in" ? li[i] : ri[i];
+      const far  = side === "in" ? ci[i] : co[i];
+
+      const g = el("g", { class: "fin-band", tabindex: "0", role: "button",
+                          "aria-label": name + " " + oku(val) });
+
+      g.appendChild(el("path", {
+        class: "fin-ribbon",
+        d: side === "in" ? ribbon(LX + LW, near, CX, far) : ribbon(CX + CW, far, RX, near),
+        fill: "#000", opacity: i % 2 ? 0.12 : 0.18
+      }));
+
+      g.appendChild(el("rect", {
+        x: side === "in" ? LX : RX, y: near.y0,
+        width: side === "in" ? LW : RW, height: Math.max(near.h, 1),
+        fill: "#000", rx: 2
+      }));
+
+      const cy  = (near.y0 + near.y1) / 2;
+      const two = near.h >= 27;
+      const tx  = side === "in" ? LX + LW + 8 : RX - 8;
+      const anc = side === "in" ? "start" : "end";
+
+      const t1 = el("text", { x: tx, y: two ? cy - 2 : cy + 4, "text-anchor": anc, class: "fin-name" });
+      t1.textContent = name;
+      g.appendChild(t1);
+
+      if (two) {
+        const t2 = el("text", { x: tx, y: cy + 12, "text-anchor": anc, class: "fin-val" });
+        t2.textContent = oku(val) + "・" + (val / TOTAL * 100).toFixed(1) + "%";
+        g.appendChild(t2);
+      }
+
+      const show = () => {
+        svg.querySelectorAll(".fin-band").forEach(b => b.classList.remove("on"));
+        g.classList.add("on");
+        read.innerHTML =
+          "<b>" + name + "</b>" +
+          '<span class="fin-read-v">' + oku(val) + "</span>" +
+          '<span class="fin-read-p">' + (val / TOTAL * 100).toFixed(1) + "%" +
+          (diff ? "　前年度 " + diff : "") + "</span>" +
+          '<span class="fin-read-d">' + desc + "</span>";
+      };
+      g.addEventListener("pointerenter", show);
+      g.addEventListener("pointerdown", show);
+      g.addEventListener("focus", show);
+      frag.appendChild(g);
+    });
+  };
+  build(IN, "in");
+  build(OUT, "out");
+
+  const cap = el("text", { x: CX + CW / 2, y: TOP - 9, "text-anchor": "middle", class: "fin-cap" });
+  cap.textContent = "152億7,000万円";
+  frag.appendChild(cap);
+
+  svg.appendChild(frag);
+})();
+</script>
 </body>
 </html>

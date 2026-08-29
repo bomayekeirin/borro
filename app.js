@@ -386,7 +386,11 @@ function wireFilter() {
 /* ==========================================================================
    9. 準備中ページ
    ========================================================================== */
-function buildSoon(catId) {
+/* ページの一部として差し込みたいときは、差し込み先のIDを渡す。
+   life.html のように「本実装が始まったページ」で、残りだけ準備中にする用。 */
+function buildSoonInto(catId, hostId) { buildSoon(catId, hostId); }
+
+function buildSoon(catId, hostId) {
   const cat = catById(catId);
   const d = SOON[catId] || { collected:0, plans:[] };
   const ready = CATEGORIES.filter(c => c.ready);
@@ -394,7 +398,10 @@ function buildSoon(catId) {
   mountHeader(catId);
   mountFooter();
 
-  document.getElementById("app").innerHTML = `
+  const host = document.getElementById(hostId || "app");
+
+  /* 差し込みモード（hostId 指定あり）のときは、ヒーローを二重に出さない */
+  const heroHtml = hostId ? "" : `
 <section class="hero">
   <div class="wrap">
     <p class="hero-en">${catId.toUpperCase()}</p>
@@ -402,8 +409,9 @@ function buildSoon(catId) {
     <p class="hero-lead">調べたお店は ${d.collected} 軒。<br>
       ひとつずつ確認をとってから載せるので、もう少しかかります。</p>
   </div>
-</section>
+</section>`;
 
+  host.innerHTML = heroHtml + `
 <section class="sec">
   <div class="wrap soon-box">
     <p class="sec-en" style="font-size:var(--t-md)">COMING SOON</p>

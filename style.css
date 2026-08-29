@@ -1346,3 +1346,159 @@ html { background: var(--dy-white); }
 body { transform: none; transition: opacity .36s var(--ease); }
 html.entering body { opacity: 0; transform: none; }
 html.leaving  body { opacity: 0; transform: none; transition-duration: .22s; }
+
+/* ==========================================================================
+   ★静かな構え（body.quiet）── 2026/8/28
+   --------------------------------------------------------------------------
+   行政の情報を扱う面。利用する層が広く、ポップに寄せると信用を落とす。
+
+   do-ya? の思想でいえば「土台は崩さず、演出の量だけ絞る」。
+   ヘッダー・フッターは共通のまま、本文だけを静かにする。
+
+   ルール
+     ・黄色は「行動を促す一点」だけ。面では使わない
+     ・強弱は色ではなく、余白・罫線・文字の大きさで作る
+     ・色帯は使わない（白と薄い氷色だけ）
+   ========================================================================== */
+
+/* 見出しのピル → 黒い細枠のタグに */
+.quiet .sec-ja, .quiet .hero-en {
+  background: transparent;
+  border: 1.5px solid var(--dy-black);
+  color: var(--dy-black);
+  font-size: .74rem; letter-spacing: .04em;
+  padding: 7px 14px;
+}
+.quiet .sec-ja::after { display: none; }
+
+/* 巨大英字は残すが、少し落ち着かせる */
+.quiet .sec-en { font-size: clamp(2rem, 8.5vw, 3rem); }
+
+/* 色帯を使わない。白と氷色だけで区切る */
+.quiet .sec.sun, .quiet .sec.coral, .quiet .sec.sky, .quiet .sec.moss {
+  background: var(--dy-ice); color: var(--dy-black);
+}
+.quiet .sec.tint { background: var(--dy-ice); }
+.quiet .sticker { display: none; }
+
+/* ==========================================================================
+   市のお金（サンキー図）
+   ========================================================================== */
+.fin-year {
+  margin-top: var(--s-5);
+  font-size: var(--t-xs); font-weight: 700; letter-spacing: .04em;
+  color: var(--ink-mid);
+}
+
+.fin-kpi {
+  margin-top: var(--s-5);
+  display: grid; gap: var(--s-3);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.fin-kpi > div {
+  padding: var(--s-5);
+  border: var(--line) solid var(--dy-black);
+  border-radius: var(--r-card);
+  background: var(--dy-white);
+}
+.fin-kpi dt { font-size: var(--t-xs); color: var(--ink-mid); font-weight: 700; }
+.fin-kpi dd {
+  margin: 4px 0 0; font-weight: 700;
+  font-size: var(--t-sm); line-height: 1.2;
+}
+.fin-kpi dd b {
+  font-family: var(--font-en); font-size: 2rem; font-weight: 700;
+  letter-spacing: -.01em;
+}
+.fin-kpi small { display: block; margin-top: 6px; font-size: var(--t-xs); color: var(--ink-faint); }
+
+.fin-legend {
+  margin-top: var(--s-8);
+  display: flex; justify-content: space-between;
+  font-size: var(--t-xs); font-weight: 700; color: var(--ink-mid);
+}
+
+/* 触れたときの読み上げ欄。高さを固定して、図が飛び跳ねないようにする */
+.fin-read {
+  margin-top: var(--s-3);
+  min-height: 76px;
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-card);
+  background: var(--dy-black); color: var(--dy-white);
+  font-size: var(--t-xs); line-height: 1.6;
+}
+.fin-read b {
+  font-size: var(--t-sm); font-weight: 700;
+  color: var(--dy-yellow);            /* ★黄色を使うのはここと中央の柱だけ */
+  margin-right: .6em;
+}
+.fin-read-v { font-family: var(--font-data); font-weight: 500; }
+.fin-read-p { margin-left: .8em; opacity: .65; }
+.fin-read-d { display: block; margin-top: 4px; opacity: .8; }
+
+.fin-chart { margin-top: var(--s-4); }
+.fin-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+.fin-band { cursor: pointer; }
+.fin-ribbon { transition: opacity .18s var(--ease); }
+.fin-band:hover .fin-ribbon,
+.fin-band.on .fin-ribbon,
+.fin-band:focus-visible .fin-ribbon { opacity: .46 !important; }
+.fin-band:focus { outline: none; }
+.fin-band:focus-visible .fin-name { text-decoration: underline; }
+
+.fin-name {
+  font-family: var(--font-body); font-weight: 700;
+  font-size: 11.5px; fill: var(--dy-black);
+}
+.fin-val {
+  font-family: var(--font-data); font-weight: 400;
+  font-size: 9.5px; fill: #5A5A5A;
+}
+.fin-cap {
+  font-family: var(--font-body); font-weight: 700;
+  font-size: 11px; fill: var(--dy-black);
+}
+
+/* 出典・免責。畳んでおくが、必ず置く */
+.fin-note {
+  margin-top: var(--s-8);
+  border-top: 1px solid rgba(0,0,0,.14);
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+.fin-note summary {
+  padding: var(--s-4) 0; cursor: pointer;
+  font-size: var(--t-xs); font-weight: 700; color: var(--ink-mid);
+}
+.fin-note summary::marker { color: var(--ink-faint); }
+.fin-note > div { padding-bottom: var(--s-5); }
+.fin-note p {
+  margin: 0 0 var(--s-4);
+  font-size: var(--t-xs); line-height: 1.85; color: var(--ink-mid);
+}
+.fin-note p b { color: var(--dy-black); }
+.fin-disc { color: var(--ink-faint) !important; }
+
+@media (prefers-reduced-motion: reduce) { .fin-ribbon { transition: none; } }
+
+/* --- 図の見え方の修正（2026/8/28 実機確認後） ---------------------------
+   ① 背景イラストが図に重なって読めなかった
+      → quiet では背景をさらに薄くし、図そのものは白い面の上に置く
+   ② 「84万2,000円」の「円」だけが改行で落ちていた */
+
+body.quiet .bgart-sway::before { opacity: .09; }
+
+.fin-chart {
+  padding: var(--s-5) var(--s-3) var(--s-4);
+  background: var(--dy-white);
+  border: var(--line) solid var(--dy-black);
+  border-radius: var(--r-card);
+}
+.fin-legend { padding: 0 var(--s-1); }
+
+.fin-kpi dd { white-space: nowrap; }
+.fin-kpi dd b { font-size: 1.75rem; }
+
+/* 図が2画面ぶんあるので、読み上げ欄は画面の上に貼りつける。
+   下のほうの帯にふれても、内訳が視界から外れないようにする */
+.fin-read { position: sticky; top: calc(var(--header-h) + 8px); z-index: 5; }

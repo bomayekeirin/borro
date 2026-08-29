@@ -274,13 +274,84 @@ buildSoonInto("life", "app");
     const rows = now === "all" ? SUP : SUP.filter(s => s[2] === now);
     count.textContent = `${rows.length} 件`;
     list.innerHTML = rows.map(([name, dept, , path, note, guess]) => `
-      <a class="sup-item" href="${B}${path}" target="_blank" rel="noopener">
+      <a class="sup-item" href="${B}${path}" data-pop="1" data-name="${name}">
         <span class="sup-name">${name}</span>
         ${note ? `<span class="sup-note">${note}</span>` : ""}
         <span class="sup-dept">${dept}${guess ? '<i class="sup-q">※</i>' : ""}</span>
       </a>`).join("");
   }
   draw();
+
+  /* ======================================================================
+     制度のページを、サイトを離れずに読む
+     ----------------------------------------------------------------------
+     ★市のサーバーが埋め込みを許可していない場合（X-Frame-Options）は
+       画面が真っ白になる。それを検知して、案内に切り替える。
+       検知は「読み込み完了イベントが来ても中身が空のまま」を見るのではなく、
+       クロスオリジンでは中身を見られないため、**時間で判定**する。
+     ====================================================================== */
+  const pop   = document.getElementById("pop");
+  const panel = pop && pop.querySelector(".pop-panel");
+  const frame = document.getElementById("popFrame");
+  const title = document.getElementById("popTitle");
+  const open  = document.getElementById("popOpen");
+  const load  = document.getElementById("popLoad");
+  const xBtn  = document.getElementById("popX");
+  if (!pop) return;
+
+  let timer = null, lastFocus = null;
+
+  function show(url, name) {
+    lastFocus = document.activeElement;
+    title.textContent = name;
+    open.href = url;
+    load.hidden = false;
+    frame.style.visibility = "hidden";
+    frame.src = url;
+
+    pop.hidden = false;
+    pop.setAttribute("aria-hidden", "false");
+    document.body.classList.add("pop-lock");
+    xBtn.focus();
+
+    /* 読み込みの間だけ「読み込んでいます」を出す */
+    clearTimeout(timer);
+    timer = setTimeout(reveal, 2500);
+  }
+
+  /* ★埋め込みが拒否されたかは、JavaScript では確実に判定できない。
+     X-Frame-Options で拒否されたときも、ブラウザは成功と同じ load を出し、
+     中身も別ドメイン扱いになるため、成功と見分けがつかない。
+
+     → 当てにならない判定を持つより、**逃げ道を常に見せる**。
+        枠の下に「表示されないときは」の一行を必ず置き、
+        その下に市の公式ページを開くボタンを置く。 */
+  function reveal() {
+    clearTimeout(timer);
+    load.hidden = true;
+    frame.style.visibility = "visible";
+  }
+  frame.addEventListener("load", () => setTimeout(reveal, 200));
+
+  function hide() {
+    clearTimeout(timer);
+    pop.hidden = true;
+    pop.setAttribute("aria-hidden", "true");
+    frame.src = "about:blank";
+    document.body.classList.remove("pop-lock");
+    if (lastFocus) lastFocus.focus();
+  }
+
+  list.addEventListener("click", e => {
+    const a = e.target.closest("a[data-pop]");
+    if (!a) return;
+    e.preventDefault();
+    show(a.getAttribute("href"), a.dataset.name);
+  });
+
+  xBtn.addEventListener("click", hide);
+  document.getElementById("popBack").addEventListener("click", hide);
+  addEventListener("keydown", e => { if (e.key === "Escape" && !pop.hidden) hide(); });
 })();
 
 

@@ -1853,3 +1853,137 @@ body.quiet .bgart-sway::before { opacity: .09; }
    次の行に落ちていたので、行の分かれ方をそろえる */
 .tb-none, .gt-kind, .sec-en, .hero-h { text-wrap: balance; }
 .tb-none { line-height: 1.45; }
+
+/* ==========================================================================
+   ★しぼりこみの固定表示（2026/8/29）
+   --------------------------------------------------------------------------
+   一覧を見ている間ずっと、画面の上に貼りつく。
+   セクションを抜ければ自然に消える（position:sticky の性質）。
+   横1行に収めて横スクロールにする。折り返すと画面を3行ぶん占領するため。
+   ========================================================================== */
+.sup-sticky {
+  position: sticky; top: var(--header-h); z-index: 20;
+  margin-inline: calc(50% - 50vw);
+  padding: var(--s-3) calc(50vw - 50%);
+  background: rgba(255,255,255,.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+.sup-sticky .chips {
+  flex-wrap: nowrap; overflow-x: auto; margin: 0;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.sup-sticky .chips::-webkit-scrollbar { display: none; }
+.sup-sticky .chip { flex: none; }
+
+/* ==========================================================================
+   ★ポップアップ（2026/8/29）
+   --------------------------------------------------------------------------
+   制度のページを、サイトを離れずに読む。
+   画面いっぱいではなく、まわりを少し残して「これは重なった窓だ」と分かる大きさに。
+   閉じるボタンは、MENU と同じ黒い円で、右上に固定する。
+   ========================================================================== */
+body.pop-lock { overflow: hidden; }
+
+.pop { position: fixed; inset: 0; z-index: 90; }
+.pop-back { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+
+.pop-panel {
+  position: absolute;
+  top: 46px; right: 10px; bottom: 10px; left: 10px;
+  display: flex; flex-direction: column;
+  background: var(--dy-white);
+  border: var(--line) solid var(--dy-black);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,.35);
+}
+
+.pop-bar {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-3) var(--s-3) var(--s-3) var(--s-5);
+  border-bottom: var(--line) solid var(--dy-black);
+  background: var(--dy-ice);
+}
+.pop-head { min-width: 0; }
+.pop-title {
+  font-size: var(--t-sm); font-weight: 900; line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pop-src {
+  margin-top: 2px; font-size: 10px; font-weight: 700;
+  color: var(--ink-mid); letter-spacing: .02em;
+}
+.pop-src span { font-family: var(--font-data); font-weight: 400; margin-left: .5em; opacity: .75; }
+
+.pop-x {
+  margin-left: auto; flex: none;
+  width: 58px; height: 58px; border: 0; border-radius: 50%;
+  background: var(--dy-black); color: var(--dy-yellow);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  font-family: inherit; font-size: 1.15rem; line-height: 1; cursor: pointer;
+}
+.pop-x-t { font-size: 9px; font-weight: 700; letter-spacing: .04em; }
+.pop-x:hover { transform: scale(1.05); }
+
+.pop-body { position: relative; flex: 1; min-height: 0; background: var(--dy-white); }
+.pop-frame { width: 100%; height: 100%; border: 0; display: block; }
+.pop-load {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: var(--t-xs); font-weight: 700; color: var(--ink-faint);
+}
+.pop-fail {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: var(--s-3);
+  padding: var(--s-8) var(--s-6); text-align: center;
+}
+.pop-fail-h { font-size: var(--t-sm); font-weight: 900; }
+.pop-fail p { font-size: var(--t-xs); line-height: 1.85; color: var(--ink-mid); }
+
+.pop-foot {
+  padding: var(--s-3) var(--s-4);
+  border-top: var(--line) solid var(--dy-black);
+  background: var(--dy-white);
+}
+.pop-open {
+  display: flex; align-items: center; justify-content: center; gap: .4em;
+  min-height: 50px; border-radius: 999px;
+  background: var(--dy-black); color: var(--dy-yellow);
+  font-size: var(--t-sm); font-weight: 700;
+}
+.pop-open .btn-en { color: var(--dy-yellow); }
+.pop-open:hover { background: #1a1a1a; }
+
+/* 制度カードは、ポップアップで開くことが分かる印にする */
+.sup-item::after { content: "＋"; font-size: 1rem; }
+
+/* ==========================================================================
+   ★2件の修正（2026/8/29）── どちらも原因は同じルール
+   --------------------------------------------------------------------------
+   `body > *:not(.bgart) { position: relative; z-index: 1; }`
+   このルールは詳細度が (0,1,1) あり、`.pop`（0,1,0）に競り勝ってしまう。
+   結果、ポップアップの position:fixed が relative に上書きされ、
+   高さ4pxの箱に潰れていた。
+
+   ついでに、**ヘッダーがずっと固定されていなかった**ことも判明した。
+   `.hd` は position:sticky だが、親の `<div id="hd">` の高さぶんしか
+   貼りつけない（sticky は親の箱の中でしか効かない）ため、
+   スクロールするとすぐ流れていた。
+   → 親に display:contents を与えて箱を消し、body 直下と同じ扱いにする。
+   ========================================================================== */
+#hd { display: contents; }
+body > .pop { position: fixed; inset: 0; z-index: 90; }
+
+/* CSS で display を指定した要素は、hidden 属性が効かなくなる。
+   「読み込み中」と「表示できません」が両方出ていたのはこれが原因 */
+.pop-load[hidden], .pop-fail[hidden], .pop[hidden] { display: none !important; }
+
+/* 開いた直後に閉じるボタンへ焦点が当たる。既定の青い枠だと浮くので黄色に */
+.pop-x:focus-visible { outline: 3px solid var(--dy-yellow); outline-offset: 3px; }
+.pop-x:focus:not(:focus-visible) { outline: none; }
+
+/* 埋め込みが拒否されたかは判定できないので、逃げ道は常に出しておく */
+.pop-hint {
+  margin-bottom: var(--s-3); text-align: center;
+  font-size: 11px; color: var(--ink-faint); line-height: 1.6;
+}

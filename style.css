@@ -1502,3 +1502,253 @@ body.quiet .bgart-sway::before { opacity: .09; }
 /* 図が2画面ぶんあるので、読み上げ欄は画面の上に貼りつける。
    下のほうの帯にふれても、内訳が視界から外れないようにする */
 .fin-read { position: sticky; top: calc(var(--header-h) + 8px); z-index: 5; }
+
+/* ==========================================================================
+   今日のごみ（暮らしページ）
+   --------------------------------------------------------------------------
+   使う層がいちばん広い機能。高齢者のスマホで、遠目でも読めることを優先する。
+   黄色は「今日出せる」の一点だけに使う。
+   ========================================================================== */
+.gomi-ask {
+  margin-top: var(--s-6);
+  font-size: var(--t-sm); font-weight: 700;
+}
+.gomi-pick {
+  margin-top: var(--s-4);
+  display: grid; gap: var(--s-3);
+  grid-template-columns: repeat(2, 1fr);
+}
+.gomi-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; min-height: 76px; padding: var(--s-3);
+  background: var(--dy-white);
+  border: var(--line) solid var(--dy-black);
+  border-radius: var(--r-card);
+  color: var(--dy-black); cursor: pointer;
+  font-family: inherit;
+  transition: background .16s var(--ease), transform .16s var(--ease);
+}
+.gomi-btn b { font-size: 1.2rem; font-weight: 700; line-height: 1.2; }
+.gomi-btn span { font-size: var(--t-xs); color: var(--ink-mid); }
+.gomi-btn:hover { transform: translateY(-2px); }
+.gomi-btn.on { background: var(--dy-black); color: var(--dy-white); }
+.gomi-btn.on span { color: rgba(255,255,255,.65); }
+
+/* --- 今日の大きなカード --- */
+.gomi-today {
+  margin-top: var(--s-6);
+  padding: var(--s-8) var(--s-5);
+  border: var(--line) solid var(--dy-black);
+  border-radius: var(--r-card);
+  background: var(--dy-white);
+  text-align: center;
+}
+.gomi-today.has { background: var(--dy-yellow); }   /* ★出せる日だけ黄色 */
+.gt-date { font-size: var(--t-xs); font-weight: 700; color: var(--ink-mid); }
+.gomi-today.has .gt-date { color: rgba(0,0,0,.62); }
+.gt-lead { font-size: var(--t-sm); font-weight: 700; margin-top: var(--s-3); }
+.gt-kind {
+  font-size: clamp(2rem, 10vw, 2.8rem); font-weight: 900;
+  line-height: 1.25; letter-spacing: -.01em; margin: var(--s-2) 0;
+}
+.gt-none { font-size: clamp(1.5rem, 7vw, 2rem); color: var(--ink-mid); }
+.gt-sub { margin-top: var(--s-4); font-size: var(--t-xs); font-weight: 700; }
+.gomi-today.has .gt-sub { color: rgba(0,0,0,.7); }
+.gt-next {
+  margin-top: var(--s-3); padding-top: var(--s-3);
+  border-top: 1px solid rgba(0,0,0,.2);
+  font-size: var(--t-xs); color: rgba(0,0,0,.62);
+}
+
+/* --- これから7日ぶん --- */
+.gomi-week {
+  margin-top: var(--s-4);
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+}
+.gw-day {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: var(--s-3) 2px;
+  border: 1.5px solid rgba(0,0,0,.18); border-radius: 10px;
+  background: var(--dy-white);
+}
+.gw-day.gw-today { border-color: var(--dy-black); border-width: var(--line); }
+.gw-day.gw-empty { background: rgba(0,0,0,.03); }
+.gw-w { font-size: 10px; font-weight: 700; }
+.gw-w.w0 { color: #C4402B; }
+.gw-w.w6 { color: #2B6BC4; }
+.gw-d { font-family: var(--font-data); font-size: 13px; font-weight: 500; }
+.gw-k { display: flex; flex-direction: column; gap: 2px; align-items: center; }
+.gw-k i {
+  font-style: normal; font-size: 9px; font-weight: 700; line-height: 1;
+  padding: 3px 2px; border-radius: 4px; width: 100%; text-align: center;
+}
+.k-burn { background: var(--dy-yellow); color: #000; }
+.k-non  { background: var(--dy-black);  color: #fff; }
+.k-rec  { background: #fff; color: #000; box-shadow: inset 0 0 0 1.5px #000; }
+.k-none { color: var(--ink-faint); }
+
+/* --- この校区の決まった曜日 --- */
+.gomi-fixed {
+  margin: var(--s-5) 0 0;
+  border-top: 1px solid rgba(0,0,0,.14);
+}
+.gomi-fixed > div {
+  display: flex; align-items: baseline; gap: var(--s-4);
+  padding: var(--s-3) 0; border-bottom: 1px solid rgba(0,0,0,.09);
+}
+.gomi-fixed dt { font-size: var(--t-xs); color: var(--ink-mid); min-width: 7em; font-weight: 700; }
+.gomi-fixed dd { margin: 0; font-size: var(--t-sm); font-weight: 700; }
+
+.gomi-rule {
+  margin: var(--s-6) 0 0; padding: 0; list-style: none;
+  display: grid; gap: var(--s-2);
+}
+.gomi-rule li {
+  position: relative; padding-left: 1.2em;
+  font-size: var(--t-xs); color: var(--ink-mid); line-height: 1.7;
+}
+.gomi-rule li::before {
+  content: ""; position: absolute; left: 0; top: .62em;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--dy-black);
+}
+.gomi-rule b { color: var(--dy-black); }
+
+.gomi-warn {
+  margin-top: var(--s-5); padding: var(--s-4);
+  border-left: 3px solid var(--dy-black);
+  background: rgba(0,0,0,.04);
+  font-size: var(--t-xs); line-height: 1.75; color: var(--ink-mid);
+}
+
+.gomi-links {
+  margin-top: var(--s-5);
+  display: flex; flex-wrap: wrap; gap: var(--s-2);
+}
+.gomi-links a {
+  padding: 8px 14px; border-radius: 999px;
+  border: 1.5px solid var(--dy-black);
+  font-size: var(--t-xs); font-weight: 700; color: var(--dy-black);
+}
+.gomi-links a:hover { background: var(--dy-black); color: var(--dy-yellow); }
+
+.gomi-tel {
+  margin-top: var(--s-5);
+  font-size: var(--t-xs); line-height: 1.8; color: var(--ink-mid);
+}
+.gomi-tel a {
+  font-family: var(--font-data); font-size: var(--t-sm);
+  font-weight: 500; color: var(--dy-black); border-bottom: 1.5px solid var(--dy-black);
+}
+
+/* ==========================================================================
+   給付・助成・手当
+   ========================================================================== */
+.sup-lead {
+  margin-top: var(--s-5);
+  font-size: var(--t-xs); line-height: 1.85; color: var(--ink-mid);
+}
+.sup-lead b { color: var(--dy-black); }
+.sup-count {
+  margin-top: var(--s-4);
+  font-size: var(--t-xs); font-weight: 700; color: var(--ink-mid);
+}
+.sup-list {
+  margin-top: var(--s-3);
+  border-top: var(--line) solid var(--dy-black);
+}
+.sup-item {
+  display: grid; gap: 2px;
+  padding: var(--s-4) 2.2em var(--s-4) 0;
+  border-bottom: 1px solid rgba(0,0,0,.14);
+  position: relative;
+}
+.sup-item::after {
+  content: "↗"; position: absolute; right: .4em; top: 50%;
+  transform: translateY(-50%); color: var(--ink-faint); font-size: .9rem;
+}
+.sup-item:hover { background: rgba(255,196,28,.2); }
+.sup-name { font-size: var(--t-sm); font-weight: 700; line-height: 1.5; color: var(--dy-black); }
+.sup-note { font-size: var(--t-xs); color: var(--ink-mid); line-height: 1.6; }
+.sup-dept {
+  font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  color: var(--ink-faint);
+}
+
+/* 静かな構えでは、しぼりこみも黄色を使わず白黒で組む
+   （このページで黄色を使うのは「今日出せるごみ」と「予算の柱」だけ） */
+.quiet .chip { border-color: rgba(0,0,0,.3); }
+.quiet .chip:hover { background: rgba(0,0,0,.05); border-color: var(--dy-black); }
+.quiet .chip.on { background: var(--dy-black); border-color: var(--dy-black); color: var(--dy-white); }
+.quiet .sup-item:hover { background: rgba(0,0,0,.04); }
+
+/* 担当課が推定のものに付ける印。推定を事実として見せない */
+.sup-q { font-style: normal; margin-left: .25em; color: var(--ink-faint); }
+.sup-foot {
+  margin-top: var(--s-5); padding: var(--s-4);
+  border-left: 3px solid rgba(0,0,0,.3);
+  font-size: var(--t-xs); line-height: 1.8; color: var(--ink-mid);
+}
+.sup-foot b { color: var(--dy-black); }
+
+/* ==========================================================================
+   今日の当番医
+   --------------------------------------------------------------------------
+   ★医療の情報。迷わせない・誤らせないことを最優先にする。
+     電話番号はすべてタップで発信できるようにし、
+     「行く前に必ず電話で確認」を当番医そのものと同じ強さで出す。
+   ========================================================================== */
+.tb-top {
+  margin-top: var(--s-6);
+  padding: var(--s-6) var(--s-5);
+  border: var(--line) solid var(--dy-black);
+  border-radius: var(--r-card);
+  background: var(--dy-white);
+  text-align: center;
+}
+.tb-top.has { background: var(--dy-yellow); }
+.tb-date { font-size: var(--t-xs); font-weight: 700; color: var(--ink-mid); }
+.tb-top.has .tb-date { color: rgba(0,0,0,.62); }
+.tb-lead { margin-top: 2px; font-size: var(--t-md); font-weight: 900; }
+.tb-none { font-size: clamp(1.15rem, 5.4vw, 1.5rem); font-weight: 900; margin-top: var(--s-3); }
+.tb-sub { margin-top: var(--s-3); font-size: var(--t-xs); line-height: 1.8; color: var(--ink-mid); }
+.tb-sub b { color: var(--dy-black); }
+
+.tb-list { margin-top: var(--s-4); display: grid; gap: var(--s-3); }
+.tb-dr {
+  display: grid; gap: 3px; padding: var(--s-4);
+  background: var(--dy-white);
+  border: var(--line) solid var(--dy-black);
+  border-radius: 12px; text-align: left;
+}
+.tb-dr:hover { background: var(--dy-black); }
+.tb-dr:hover .tb-name, .tb-dr:hover .tb-sec { color: var(--dy-white); }
+.tb-dr:hover .tb-tel { color: var(--dy-yellow); }
+.tb-sec { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--ink-mid); }
+.tb-name { font-size: var(--t-md); font-weight: 900; line-height: 1.35; color: var(--dy-black); }
+.tb-tel {
+  font-family: var(--font-data); font-weight: 500; font-size: var(--t-sm);
+  color: var(--dy-black);
+}
+.tb-hours { margin-top: var(--s-4); font-size: var(--t-xs); font-weight: 700; color: rgba(0,0,0,.7); }
+
+.tb-emerg {
+  margin-top: var(--s-4); padding: var(--s-5);
+  background: var(--dy-black); color: var(--dy-white);
+  border-radius: var(--r-card);
+}
+.tb-emerg-h { font-size: var(--t-sm); font-weight: 900; color: var(--dy-yellow); }
+.tb-emerg p { margin-top: var(--s-2); font-size: var(--t-xs); line-height: 1.75; opacity: .85; }
+.tb-call {
+  margin-top: var(--s-4);
+  display: flex; align-items: baseline; gap: var(--s-3); flex-wrap: wrap;
+  padding: var(--s-4) var(--s-5);
+  background: var(--dy-yellow); color: var(--dy-black);
+  border-radius: 999px;
+}
+.tb-call b { font-size: var(--t-sm); font-weight: 900; }
+.tb-call span {
+  font-family: var(--font-data); font-weight: 500; font-size: var(--t-md);
+  margin-left: auto;
+}
+.tb-119 { margin-top: var(--s-4) !important; opacity: 1 !important; }
+.tb-119 b { color: var(--dy-yellow); font-size: var(--t-sm); }

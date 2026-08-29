@@ -36,10 +36,11 @@ buildSoonInto("life", "app");
       say: { burn: "水曜・土曜", nonburn: "第4金曜", recycle: "木曜" } },
   ];
 
+  /* ★色は枕崎市の指定ごみ袋に合わせている（緑・赤・黄） */
   const KIND = {
-    burn:    { label: "もえるごみ",   short: "もえる",   cls: "k-burn" },
-    nonburn: { label: "もえないごみ", short: "もえない", cls: "k-non"  },
-    recycle: { label: "資源ごみ",     short: "資源",     cls: "k-rec"  },
+    burn:    { label: "もえるごみ",   short: "もえる",   cls: "k-burn", bag: "b-burn", t: "t-burn", bagName: "緑の袋" },
+    nonburn: { label: "もえないごみ", short: "もえない", cls: "k-non",  bag: "b-non",  t: "t-non",  bagName: "赤の袋" },
+    recycle: { label: "資源ごみ",     short: "資源",     cls: "k-rec",  bag: "b-rec",  t: "t-rec",  bagName: "黄の袋" },
   };
   const WD = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -107,13 +108,16 @@ buildSoonInto("life", "app");
         + next.k.map(x => KIND[x].label).join("と")
       : "";
 
-    today.className = "gomi-today" + (t.length ? " has" : "");
+    /* カードの地色は、その日に出す袋の色にする */
+    today.className = "gomi-today" + (t.length ? " has " + KIND[t[0]].t : "");
     today.innerHTML = `
       <p class="gt-date">${now.getMonth() + 1}月${now.getDate()}日（${WD[now.getDay()]}）・${area.full}</p>
       ${t.length
         ? `<p class="gt-lead">今日は</p>
            <p class="gt-kind">${t.map(x => KIND[x].label).join("<br>")}</p>
            <p class="gt-lead">の日です</p>
+           <p class="gt-bag">${t.map(x =>
+              `<i class="${KIND[x].bag}"></i>${KIND[x].bagName}`).join("")}</p>
            <p class="gt-sub">朝7時から8時までに集積所へ</p>`
         : `<p class="gt-kind gt-none">収集はありません</p>
            <p class="gt-sub">次は ${nextTxt}</p>`}
@@ -136,15 +140,23 @@ buildSoonInto("life", "app");
     }
     week.innerHTML = html;
 
+    /* 色の意味（袋の色そのもの） */
+    const lg = document.getElementById("gomiLegend");
+    if (lg) lg.innerHTML =
+      '<span><i class="b-burn"></i>もえる</span>' +
+      '<span><i class="b-non"></i>もえない</span>' +
+      '<span><i class="b-rec"></i>資源</span>' +
+      "<em>色は指定ごみ袋と同じです</em>";
+
     /* --- この校区の決まった曜日 --- */
-    week.insertAdjacentHTML("afterend", "");
     const fixed = document.getElementById("gomiFixed");
     if (fixed) fixed.remove();
-    week.insertAdjacentHTML("afterend", `
+    const anchor = document.getElementById("gomiLegend") || week;
+    anchor.insertAdjacentHTML("afterend", `
       <dl class="gomi-fixed" id="gomiFixed">
-        <div><dt>もえるごみ</dt><dd>${area.say.burn}</dd></div>
-        <div><dt>もえないごみ</dt><dd>${area.say.nonburn}</dd></div>
-        <div><dt>資源ごみ</dt><dd>${area.say.recycle}</dd></div>
+        <div class="f-burn"><dt>もえるごみ</dt><dd>${area.say.burn}</dd></div>
+        <div class="f-non"><dt>もえないごみ</dt><dd>${area.say.nonburn}</dd></div>
+        <div class="f-rec"><dt>資源ごみ</dt><dd>${area.say.recycle}</dd></div>
       </dl>`);
   }
 

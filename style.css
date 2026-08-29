@@ -1582,9 +1582,13 @@ body.quiet .bgart-sway::before { opacity: .09; }
   font-style: normal; font-size: 9px; font-weight: 700; line-height: 1;
   padding: 3px 2px; border-radius: 4px; width: 100%; text-align: center;
 }
-.k-burn { background: var(--dy-yellow); color: #000; }
-.k-non  { background: var(--dy-black);  color: #fff; }
-.k-rec  { background: #fff; color: #000; box-shadow: inset 0 0 0 1.5px #000; }
+/* ★色は枕崎市の指定ごみ袋に合わせる。
+   もえる＝緑／もえない＝赤／資源＝黄。
+   「緑の袋の日」で伝わるのが、この街でいちばん速い。
+   いずれも黒文字とのコントラスト比 7 以上を確認済み */
+.k-burn { background: var(--bag-burn); color: #000; box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.32); }
+.k-non  { background: var(--bag-non);  color: #000; box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.32); }
+.k-rec  { background: var(--bag-rec);  color: #000; box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.32); }
 .k-none { color: var(--ink-faint); }
 
 /* --- この校区の決まった曜日 --- */
@@ -1752,3 +1756,100 @@ body.quiet .bgart-sway::before { opacity: .09; }
 }
 .tb-119 { margin-top: var(--s-4) !important; opacity: 1 !important; }
 .tb-119 b { color: var(--dy-yellow); font-size: var(--t-sm); }
+
+/* ==========================================================================
+   ★指定ごみ袋の色（2026/8/29）
+   --------------------------------------------------------------------------
+   枕崎市の指定ごみ袋は もえる＝緑／もえない＝赤／資源＝黄。
+   画面の色を袋の色と揃えると、「今日は緑の袋」で瞬時に伝わる。
+   文字は必ず黒。3色とも黒文字とのコントラスト比7以上を確認済み。
+   ========================================================================== */
+:root {
+  --bag-burn: #6FC275;   /* もえる ＝ 緑（黒文字 9.65） */
+  --bag-non:  #F58077;   /* もえない ＝ 赤（黒文字 8.24） */
+  --bag-rec:  #FFC41C;   /* 資源 ＝ 黄（黒文字 13.16） */
+}
+
+/* 今日のカードも、その日の袋の色にする */
+.gomi-today.has.t-burn { background: var(--bag-burn); }
+.gomi-today.has.t-non  { background: var(--bag-non);  }
+.gomi-today.has.t-rec  { background: var(--bag-rec);  }
+
+/* カードの中に、袋そのものを小さく描く */
+.gt-bag {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-bottom: var(--s-2);
+  padding: 7px 14px 7px 10px;
+  background: rgba(255,255,255,.72);
+  border: 1.5px solid rgba(0,0,0,.5);
+  border-radius: 999px;
+  font-size: var(--t-xs); font-weight: 700;
+}
+.gt-bag i {
+  width: 15px; height: 19px; border-radius: 3px 3px 5px 5px;
+  border: 1.5px solid rgba(0,0,0,.55); display: block;
+}
+.gt-bag .b-burn { background: var(--bag-burn); }
+.gt-bag .b-non  { background: var(--bag-non);  }
+.gt-bag .b-rec  { background: var(--bag-rec);  }
+
+/* 色の意味を1行で示す。ここを読まなくても分かるのが理想だが、念のため */
+.gomi-legend {
+  margin-top: var(--s-4);
+  display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4);
+  align-items: center;
+  font-size: var(--t-xs); color: var(--ink-mid);
+}
+.gomi-legend span { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.gomi-legend i {
+  width: 13px; height: 17px; border-radius: 3px 3px 4px 4px;
+  border: 1.5px solid rgba(0,0,0,.5);
+}
+.gomi-legend .b-burn { background: var(--bag-burn); }
+.gomi-legend .b-non  { background: var(--bag-non);  }
+.gomi-legend .b-rec  { background: var(--bag-rec);  }
+.gomi-legend em { font-style: normal; color: var(--ink-faint); font-weight: 500; }
+
+/* 曜日の一覧にも、袋の色の丸を添える */
+.gomi-fixed dt { display: flex; align-items: center; gap: 7px; }
+.gomi-fixed dt::before {
+  content: ""; width: 11px; height: 14px; border-radius: 2px 2px 4px 4px;
+  border: 1.5px solid rgba(0,0,0,.5); flex: none;
+}
+.gomi-fixed .f-burn dt::before { background: var(--bag-burn); }
+.gomi-fixed .f-non  dt::before { background: var(--bag-non);  }
+.gomi-fixed .f-rec  dt::before { background: var(--bag-rec);  }
+
+/* ==========================================================================
+   ★不具合修正（2026/8/29）── MENUボタンの中身が上に寄っていた
+   --------------------------------------------------------------------------
+   .hd-menu を横並びから縦並び（flex-direction:column）に変えたとき、
+   縦方向の中央揃え（justify-content）を指定し忘れていた。
+   align-items は縦並びだと「横方向」の制御になるため、
+   縦は既定の flex-start のまま＝中身が円の上端に貼りついていた。
+   ========================================================================== */
+.hd-menu, .nav-close { justify-content: center; }
+/* 字間の分だけ文字が右にずれるので、その半分を戻す */
+.hd-menu > span:last-child, .nav-close > span:last-child { text-indent: .04em; }
+
+/* ==========================================================================
+   ★見出しに帯をつける（2026/8/29）
+   --------------------------------------------------------------------------
+   区切りがなく、項目が変わったことが分からなかった。
+   背景色で区切ると派手になるので、**見出しの部分だけ**に薄い帯を敷き、
+   下に黒い線を引いて締める。色ではなく線で区切るのは do-ya? の技法。
+   ========================================================================== */
+.quiet .sec { padding-top: var(--s-10); }
+.quiet .sec-hd {
+  padding: var(--s-6) var(--s-5) var(--s-5);
+  background: var(--dy-ice);
+  border-radius: 16px 16px 0 0;
+  border-bottom: var(--line) solid var(--dy-black);
+}
+/* 日本語の見出しは、英字ほど詰めない */
+.quiet .sec-en { line-height: 1.18; letter-spacing: .01em; }
+
+/* 「今日は当番医の日ではありません」の最後の1文字だけが
+   次の行に落ちていたので、行の分かれ方をそろえる */
+.tb-none, .gt-kind, .sec-en, .hero-h { text-wrap: balance; }
+.tb-none { line-height: 1.45; }
